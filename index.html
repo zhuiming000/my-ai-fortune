@@ -3,197 +3,345 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔮 AI运势测算大师</title>
+    <title>AI运势测算大师</title>
     <style>
-        body {
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'SimSun', serif;
+            background: linear-gradient(135deg, #8B0000 0%, #4B0082 100%);
+            color: #333;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
+            line-height: 1.6;
         }
+        
         .container {
-            background: white;
-            padding: 40px;
+            background: rgba(255, 248, 240, 0.95);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            max-width: 500px;
-            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            border: 3px double #8B0000;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: linear-gradient(90deg, #8B0000, #FFD700, #8B0000);
+        }
+        
         h1 {
-            color: #333;
+            text-align: center;
+            color: #8B0000;
+            margin-bottom: 10px;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        h1::after {
+            content: "";
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #8B0000, transparent);
+            margin: 10px auto;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #5a3921;
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+        
+        .input-group {
             margin-bottom: 20px;
         }
-        .input-group {
-            margin: 20px 0;
-        }
+        
         input[type="text"] {
-            width: 80%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #d4a76a;
             border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.3s;
+            background: #fffaf0;
+            transition: all 0.3s;
+            margin-bottom: 15px;
         }
+        
         input[type="text"]:focus {
-            border-color: #764ba2;
             outline: none;
+            border-color: #8B0000;
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.2);
         }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
         button {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+            flex: 1;
+            padding: 15px;
             border: none;
-            padding: 12px 30px;
+            border-radius: 8px;
             font-size: 16px;
-            border-radius: 8px;
+            font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin: 10px;
+            transition: all 0.3s;
         }
-        button:hover {
+        
+        #ask-button {
+            background: linear-gradient(135deg, #8B0000, #B22222);
+            color: white;
+        }
+        
+        #ask-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #B22222, #8B0000);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);
         }
+        
+        #clear-button {
+            background: linear-gradient(135deg, #4B0082, #6A5ACD);
+            color: white;
+        }
+        
+        #clear-button:hover {
+            background: linear-gradient(135deg, #6A5ACD, #4B0082);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(75, 0, 130, 0.4);
+        }
+        
         button:disabled {
-            background: #cccccc;
+            opacity: 0.7;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+            transform: none !important;
+            box-shadow: none !important;
         }
+        
         #result {
-            margin-top: 30px;
+            min-height: 150px;
             padding: 20px;
-            background: #f8f9fa;
+            background: #f9f3e9;
             border-radius: 8px;
-            border-left: 4px solid #764ba2;
-            text-align: left;
+            border-left: 5px solid #8B0000;
+            margin-top: 20px;
             white-space: pre-wrap;
-            min-height: 100px;
+            text-align: left;
         }
+        
         .loading {
-            color: #666;
+            color: #8B0000;
+            text-align: center;
             font-style: italic;
         }
-        .error {
-            color: #e74c3c;
-            border-left-color: #e74c3c;
-        }
+        
         .success {
-            color: #27ae60;
-            border-left-color: #27ae60;
+            border-left-color: #228B22;
+        }
+        
+        .error {
+            border-left-color: #FF4500;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #7a6a5a;
+        }
+        
+        .yin-yang {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, #8B0000 50%, #4B0082 50%);
+            margin: 0 auto 20px;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .yin-yang::before, .yin-yang::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+        }
+        
+        .yin-yang::before {
+            background: #4B0082;
+            top: 0;
+            left: 30px;
+        }
+        
+        .yin-yang::after {
+            background: #8B0000;
+            top: 30px;
+            left: 0;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔮 AI运势测算大师</h1>
-        <p>请输入你的问题，让AI大师为你解读运势！</p>
+        <div class="yin-yang"></div>
+        <h1>AI运势测算大师</h1>
+        <p class="subtitle">请输入你的问题，让AI大师为你解读运势!</p>
         
         <div class="input-group">
-            <input type="text" id="user-input" 
-                   placeholder="例如：测一下我今天的财运如何？" 
-                   maxlength="100">
+            <input type="text" id="user-input" placeholder="例如：测一下我今天的财运如何？" maxlength="100">
         </div>
         
-        <button onclick="askAI()" id="ask-button">请教AI大师</button>
-        <button onclick="clearInput()" id="clear-button">清空重来</button>
+        <div class="button-group">
+            <button id="ask-button">请教AI大师</button>
+            <button id="clear-button">清空重来</button>
+        </div>
         
-        <div id="result" class="loading">等待你的提问...</div>
+        <div id="result">等待你的提问...</div>
+        
+        <div class="footer">
+            <p>本测算仅供娱乐参考，命运掌握在自己手中</p>
+        </div>
     </div>
 
     <script>
-        // 获取页面元素
-        const userInput = document.getElementById('user-input');
-        const resultDiv = document.getElementById('result');
-        const askButton = document.getElementById('ask-button');
+        // 定义API地址 - 使用相对路径避免跨域问题
+        const API_URL = '/api/fortune';
         
-        // 注意：这里需要替换成你实际的Vercel应用地址
-        // 部署后你的地址通常是 https://你的项目名.vercel.app
-        const API_URL = '/api/fortune'';
-        
-        // 主要函数：向AI提问
-        async function askAI() {
-            const question = userInput.value.trim();
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取页面元素
+            const userInput = document.getElementById('user-input');
+            const askButton = document.getElementById('ask-button');
+            const clearButton = document.getElementById('clear-button');
+            const resultDiv = document.getElementById('result');
             
-            // 验证输入
-            if (!question) {
-                alert('请输入你的问题！');
-                return;
-            }
-            
-            if (question.length < 2) {
-                alert('问题太短了，请详细描述一下～');
-                return;
-            }
-            
-            // 禁用按钮，防止重复提交
-            askButton.disabled = true;
-            askButton.textContent = 'AI大师思考中...';
-            resultDiv.innerHTML = '<div class="loading">🔄 AI大师正在思考中，请稍候...</div>';
-            
-            try {
-                // 发送请求到代理接口
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        userMessage: question 
-                    })
-                });
+            // 主要的AI提问函数
+            async function askAI() {
+                const question = userInput.value.trim();
                 
-                // 检查响应状态
-                if (!response.ok) {
-                    throw new Error(`网络请求失败: ${response.status}`);
+                // 验证输入
+                if (!question) {
+                    alert('请输入你的问题！');
+                    return;
                 }
                 
-                // 解析响应数据
-                const data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
+                if (question.length < 2) {
+                    alert('问题太短了，请详细描述一下～');
+                    return;
                 }
                 
-                // 显示成功结果
-                resultDiv.className = 'success';
-                resultDiv.innerHTML = `✨ <strong>AI大师解读：</strong>\n\n${data.reply}`;
+                // 禁用按钮，防止重复提交
+                askButton.disabled = true;
+                askButton.textContent = 'AI大师思考中...';
+                resultDiv.innerHTML = '<div class="loading">🔄 AI大师正在思考中，请稍候...</div>';
+                resultDiv.className = '';
                 
-            } catch (error) {
-                // 显示错误信息
-                resultDiv.className = 'error';
-                resultDiv.innerHTML = `❌ <strong>出错了：</strong>\n\n${error.message}\n\n请检查网络连接或稍后重试。`;
-                console.error('请求失败:', error);
-            } finally {
-                // 重新启用按钮
-                askButton.disabled = false;
-                askButton.textContent = '请教AI大师';
+                try {
+                    console.log('准备发送请求到API:', API_URL);
+                    
+                    // 发送请求到API
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            userMessage: question 
+                        })
+                    });
+                    
+                    console.log('收到响应状态:', response.status);
+                    
+                    // 检查响应状态
+                    if (!response.ok) {
+                        throw new Error(`网络请求失败: ${response.status}`);
+                    }
+                    
+                    // 解析响应数据
+                    const data = await response.json();
+                    console.log('API返回数据:', data);
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    // 显示成功结果
+                    resultDiv.className = 'success';
+                    resultDiv.innerHTML = `<strong>✨ AI大师解读：</strong><br><br>${data.reply}`;
+                    
+                } catch (error) {
+                    // 显示错误信息
+                    console.error('请求失败:', error);
+                    resultDiv.className = 'error';
+                    
+                    if (error.message.includes('Failed to fetch')) {
+                        resultDiv.innerHTML = `<strong>❌ 网络连接失败：</strong><br><br>无法连接到AI大师，请检查网络连接或稍后重试。<br><br><small>错误详情: ${error.message}</small>`;
+                    } else {
+                        resultDiv.innerHTML = `<strong>❌ 出错了：</strong><br><br>${error.message}`;
+                    }
+                } finally {
+                    // 重新启用按钮
+                    askButton.disabled = false;
+                    askButton.textContent = '请教AI大师';
+                }
             }
-        }
-        
-        // 清空输入函数
-        function clearInput() {
-            userInput.value = '';
-            resultDiv.className = 'loading';
-            resultDiv.innerHTML = '等待你的提问...';
-            userInput.focus(); // 聚焦到输入框
-        }
-        
-        // 按回车键也可以提交
-        userInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                askAI();
+            
+            // 清空输入函数
+            function clearInput() {
+                userInput.value = '';
+                resultDiv.className = '';
+                resultDiv.innerHTML = '等待你的提问...';
+                userInput.focus();
             }
-        });
-        
-        // 页面加载完成后自动聚焦到输入框
-        window.addEventListener('load', function() {
+            
+            // 绑定按钮事件
+            askButton.addEventListener('click', askAI);
+            clearButton.addEventListener('click', clearInput);
+            
+            // 按回车键也可以提交
+            userInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    askAI();
+                }
+            });
+            
+            // 页面加载后自动聚焦到输入框
             userInput.focus();
+            
+            console.log('页面加载完成，所有功能已就绪');
         });
     </script>
 </body>
