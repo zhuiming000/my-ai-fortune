@@ -3,40 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>八字命理测算大师 - 专业版</title>
+    <title>生辰命盘功能 - ycml.top</title>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
+        /* 生辰命盘功能样式 */
+        .mingpan-container {
             font-family: 'Ma Shan Zheng', 'Microsoft YaHei', cursive, serif;
             background: linear-gradient(135deg, #8b0000 0%, #2f004f 100%);
             color: #333;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
-            line-height: 1.6;
-        }
-        
-        .container {
-            background: rgba(255, 248, 240, 0.95);
             border-radius: 15px;
+            margin: 20px 0;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 800px;
-            padding: 30px;
             border: 3px double #8b0000;
             position: relative;
             overflow: hidden;
         }
         
-        .container::before {
+        .mingpan-container::before {
             content: "";
             position: absolute;
             top: 0;
@@ -46,340 +30,288 @@
             background: linear-gradient(90deg, #8b0000, #d4af37, #8b0000);
         }
         
-        .yin-yang {
-            width: 80px;
-            height: 80px;
+        .mingpan-yin-yang {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: linear-gradient(90deg, #8b0000 50%, #2f004f 50%);
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
             position: relative;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
         
-        .yin-yang::before, .yin-yang::after {
+        .mingpan-yin-yang::before, .mingpan-yin-yang::after {
             content: "";
             position: absolute;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
         }
         
-        .yin-yang::before {
+        .mingpan-yin-yang::before {
             background: #2f004f;
             top: 0;
-            left: 40px;
+            left: 30px;
         }
         
-        .yin-yang::after {
+        .mingpan-yin-yang::after {
             background: #8b0000;
-            top: 40px;
+            top: 30px;
             left: 0;
         }
         
-        h1 {
+        .mingpan-title {
             text-align: center;
             color: #8b0000;
             margin-bottom: 10px;
-            font-size: 32px;
+            font-size: 24px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
         
-        .subtitle {
+        .mingpan-subtitle {
             text-align: center;
             color: #5a3921;
-            margin-bottom: 25px;
-            font-size: 16px;
-        }
-        
-        .calendar-type {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-            justify-content: center;
-        }
-        
-        .calendar-type label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-        
-        .calendar-type input {
-            margin-right: 5px;
-        }
-        
-        .input-group {
             margin-bottom: 20px;
+            font-size: 14px;
         }
         
-        .form-row {
+        .mingpan-input-section {
+            background: rgba(139, 0, 0, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #d4a76a;
+        }
+        
+        .mingpan-input-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 10px;
         }
         
-        .form-field {
+        .mingpan-input-field {
             flex: 1;
             min-width: 120px;
         }
         
-        label {
+        .mingpan-label {
             display: block;
             margin-bottom: 5px;
             color: #5a3921;
             font-weight: bold;
+            font-size: 14px;
         }
         
-        input, select {
+        .mingpan-input, .mingpan-select {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 2px solid #d4a76a;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 14px;
             background: #fffaf0;
             transition: all 0.3s;
         }
         
-        input:focus, select:focus {
+        .mingpan-input:focus, .mingpan-select:focus {
             outline: none;
             border-color: #8b0000;
-            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.2);
+            box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.2);
         }
         
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin: 25px 0;
-        }
-        
-        button {
-            flex: 1;
-            padding: 15px;
+        .mingpan-button {
+            padding: 12px 25px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-        }
-        
-        #calculate-btn {
             background: linear-gradient(135deg, #8b0000, #b22222);
             color: white;
+            display: block;
+            margin: 15px auto 0;
         }
         
-        #calculate-btn:hover:not(:disabled) {
+        .mingpan-button:hover {
             background: linear-gradient(135deg, #b22222, #8b0000);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);
+            box-shadow: 0 5px 10px rgba(139, 0, 0, 0.3);
         }
         
-        #clear-btn {
-            background: linear-gradient(135deg, #4b0082, #6a5acd);
-            color: white;
-        }
-        
-        #clear-btn:hover {
-            background: linear-gradient(135deg, #6a5acd, #4b0082);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(75, 0, 130, 0.4);
-        }
-        
-        button:disabled {
+        .mingpan-button:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: none !important;
             box-shadow: none !important;
         }
         
-        #result {
-            min-height: 200px;
-            padding: 20px;
-            background: #f9f3e9;
-            border-radius: 8px;
-            border-left: 5px solid #8b0000;
-            margin-top: 20px;
+        .mingpan-result-section {
             display: none;
+            margin-top: 20px;
         }
         
-        .bazi-grid {
+        .mingpan-destiny-chart {
+            background: #f9f3e9;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #8b0000;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mingpan-chart-title {
+            text-align: center;
+            color: #8b0000;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #d4a76a;
+            padding-bottom: 8px;
+        }
+        
+        .mingpan-chart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .mingpan-chart-table td {
+            padding: 8px 10px;
+            border: 1px solid #d4a76a;
+            text-align: center;
+        }
+        
+        .mingpan-chart-table tr:first-child td {
+            background: rgba(139, 0, 0, 0.1);
+            font-weight: bold;
+        }
+        
+        .mingpan-pillar-section {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 8px;
             margin: 15px 0;
         }
         
-        .bazi-pillar {
-            text-align: center;
-            padding: 10px;
+        .mingpan-pillar-item {
             background: linear-gradient(135deg, #f5e6d3, #e8d0b3);
-            border-radius: 8px;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
             border: 2px solid #d4a76a;
         }
         
-        .pillar-label {
-            font-size: 14px;
+        .mingpan-pillar-label {
+            font-size: 12px;
             color: #8b0000;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         
-        .pillar-value {
-            font-size: 20px;
+        .mingpan-pillar-value {
+            font-size: 16px;
             font-weight: bold;
             color: #5a3921;
         }
         
-        .interpretation-section {
+        .mingpan-luck-chart {
             margin-top: 20px;
+            background: white;
+            border-radius: 6px;
             padding: 15px;
-            background: rgba(139, 0, 0, 0.05);
-            border-radius: 8px;
-            border-left: 3px solid #d4af37;
+            border: 1px solid #d4a76a;
         }
         
-        .interpretation-section h4 {
+        .mingpan-luck-title {
+            text-align: center;
             color: #8b0000;
             margin-bottom: 10px;
-            border-bottom: 1px solid #d4a76a;
-            padding-bottom: 5px;
+            font-size: 16px;
         }
         
-        .element-chart {
-            display: flex;
-            height: 40px;
-            margin: 15px 0;
-            gap: 5px;
-            align-items: end;
-        }
-        
-        .element-bar {
-            flex: 1;
-            background: linear-gradient(to top, #d4a76a, #8b0000);
-            border-radius: 3px 3px 0 0;
-            position: relative;
-            min-height: 5px;
-        }
-        
-        .element-label {
-            position: absolute;
-            bottom: -25px;
-            left: 0;
-            right: 0;
+        .mingpan-footer {
             text-align: center;
+            margin-top: 15px;
             font-size: 12px;
-            color: #5a3921;
-        }
-        
-        .ten-gods-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 10px 0;
-        }
-        
-        .ten-god-item {
-            padding: 8px;
-            background: rgba(139, 0, 0, 0.1);
-            border-radius: 5px;
-            text-align: center;
-            font-size: 14px;
-        }
-        
-        .loading {
-            text-align: center;
-            color: #8b0000;
-            font-style: italic;
-            padding: 20px;
-        }
-        
-        .error {
-            color: #ff4500;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
             color: #7a6a5a;
         }
         
-        @media (max-width: 600px) {
-            .form-row {
+        @media (max-width: 768px) {
+            .mingpan-input-row {
                 flex-direction: column;
             }
             
-            .form-field {
+            .mingpan-input-field {
                 min-width: 100%;
             }
             
-            .button-group {
-                flex-direction: column;
-            }
-            
-            .bazi-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .ten-gods-grid {
+            .mingpan-pillar-section {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="yin-yang"></div>
-        <h1>八字命理测算大师</h1>
-        <p class="subtitle">请输入您的出生信息，获取精准八字排盘与专业命理解读</p>
+    <!-- 这是您现有网站的内容 -->
+    <div class="your-existing-content">
+        <h1>欢迎访问 ycml.top</h1>
+        <p>这是您网站的现有内容...</p>
+    </div>
+    
+    <!-- 生辰命盘功能集成部分 -->
+    <div class="mingpan-container">
+        <div class="mingpan-yin-yang"></div>
+        <h2 class="mingpan-title">生辰命盘生成系统</h2>
+        <p class="mingpan-subtitle">请输入您的生辰信息，生成专业命理排盘</p>
         
-        <div class="calendar-type">
-            <label>
-                <input type="radio" name="calendar-type" value="solar" checked> 公历输入
-            </label>
-            <label>
-                <input type="radio" name="calendar-type" value="lunar"> 农历输入
-            </label>
-        </div>
-        
-        <div class="input-group">
-            <div class="form-row">
-                <div class="form-field">
-                    <label for="name">姓名</label>
-                    <input type="text" id="name" placeholder="请输入姓名">
+        <div class="mingpan-input-section">
+            <div class="mingpan-input-row">
+                <div class="mingpan-input-field">
+                    <label class="mingpan-label" for="mingpan-name">姓名</label>
+                    <input type="text" id="mingpan-name" class="mingpan-input" placeholder="请输入姓名">
                 </div>
-                <div class="form-field">
-                    <label for="gender">性别</label>
-                    <select id="gender">
+                <div class="mingpan-input-field">
+                    <label class="mingpan-label" for="mingpan-gender">性别</label>
+                    <select id="mingpan-gender" class="mingpan-select">
                         <option value="男">男</option>
                         <option value="女">女</option>
                     </select>
                 </div>
             </div>
             
-            <div class="form-row">
-                <div class="form-field">
-                    <label for="year">出生年份</label>
-                    <input type="number" id="year" min="1900" max="2025" placeholder="如：1990">
+            <div class="mingpan-input-row">
+                <div class="mingpan-input-field">
+                    <label class="mingpan-label" for="mingpan-year">出生年份</label>
+                    <input type="number" id="mingpan-year" class="mingpan-input" min="1900" max="2025" placeholder="如：2001">
                 </div>
-                <div class="form-field">
-                    <label for="month">出生月份</label>
-                    <input type="number" id="month" min="1" max="12" placeholder="1-12">
+                <div class="mingpan-input-field">
+                    <label class="mingpan-label" for="mingpan-month">出生月份</label>
+                    <select id="mingpan-month" class="mingpan-select">
+                        <option value="1">正月</option>
+                        <option value="2">二月</option>
+                        <option value="3">三月</option>
+                        <option value="4">四月</option>
+                        <option value="5">五月</option>
+                        <option value="6">六月</option>
+                        <option value="7">七月</option>
+                        <option value="8">八月</option>
+                        <option value="9">九月</option>
+                       极option value="10">十月</option>
+                        <option value="11">冬月</option>
+                        <option value="12">腊月</option>
+                    </select>
+                </div>
+                <div class="mingpan-input-field">
+                    <label class="mingpan-label" for="mingpan-day">出生日期</label>
+                    <input type="number" id="mingpan-day" class="mingpan-input" min="1" max="31" placeholder="1-31">
                 </div>
             </div>
             
-            <div class="form-row">
-                <div class="form-field">
-                    <label for="day">出生日期</label>
-                    <input type="number" id="day" min="1" max="31" placeholder="1-31">
-                </div>
-                <div class="form-field">
-                    <label for="hour">出生时辰</label>
-                    <select id="hour">
+            <div class="mingpan-input-row">
+                <div class="mingpan-input-field">
+                    <label class="mingpan-label" for="mingpan-hour">出生时辰</label>
+                    <select id="mingpan-hour" class="mingpan-select">
                         <option value="0">子时 (23:00-01:00)</option>
-                        <option value="1">丑时 (01:00-03:00)</option>
+                        <option value="1">丑极 (01:00-03:00)</option>
                         <option value="2">寅时 (03:00-05:00)</option>
                         <option value="3">卯时 (05:00-07:00)</option>
                         <option value="4">辰时 (07:00-09:00)</option>
@@ -387,465 +319,205 @@
                         <option value="6">午时 (11:00-13:00)</option>
                         <option value="7">未时 (13:00-15:00)</option>
                         <option value="8">申时 (15:00-17:00)</option>
-                        <option value="9">酉时 (17:00-19:00)</option>
+                        <option value="9">酉时 (17:00-19:00)</极option>
                         <option value="10">戌时 (19:00-21:00)</option>
                         <option value="11">亥时 (21:00-23:00)</option>
                     </select>
                 </div>
             </div>
+            
+            <button id="mingpan-generate-btn" class="mingpan-button">生成命盘</button>
         </div>
         
-        <div class="button-group">
-            <button id="calculate-btn">测算八字</button>
-            <button id="clear-btn">清空重来</button>
+        <div class="mingpan-result-section" id="mingpan-result-section">
+            <div class="mingpan-destiny-chart">
+                <h3 class="mingpan-chart-title" id="mingpan-chart-title">命主生辰命盘</h3>
+                
+                <table class="mingpan-chart-table">
+                    <tr>
+                        <td id="mingpan-destiny-type">乾造</td>
+                        <td colspan="2" id="mingpan-name-gender">姓名： 性别：</td>
+                    </tr>
+                    <tr>
+                        <td>生辰</td>
+                        <td colspan="2" id="mingpan-birth-date">年月日</td>
+                    </tr>
+                    <tr>
+                        <td>时间</td>
+                        <td>年柱</td>
+                        <td>月柱</td>
+                        <td>日柱</td>
+                        <td>时柱</td>
+                    </tr>
+                    <tr>
+                        <td>天干</td>
+                        <td id="mingpan-year-stem-god">七杀</td>
+                        <td id="mingpan-month-stem-god">劫财</td>
+                        <td id="mingpan-day-stem-g极">命主</td>
+                        <td id="mingpan-hour-stem-god">伤官</td>
+                    </tr>
+                    <tr>
+                        <td>八字</td>
+                        <td id="mingpan-year-pillar">辛巳</td>
+                        <td id="mingpan-month-pillar">甲午</td>
+                        <td id="mingpan-day-pillar">乙丑</td>
+                        <td id="mingpan-hour-pillar">丙子</td>
+                    </tr>
+                    <tr>
+                        <td>地支</td>
+                        <极 id="mingpan-year-branch-god">伤官</td>
+                        <td id="mingpan-month-branch-god">食神</td>
+                        <td id="mingpan-day-branch-god">偏财</td>
+                        <td id="mingpan-hour-branch-god">偏印</td>
+                    </tr>
+                    <tr>
+                        <td>纳音</td>
+                        <td id="mingpan-year-nayin">白腊金</td>
+                        <td id="mingpan-month-nayin">砂石金</td>
+                        <td id="mingpan-day-nayin">海中金</td>
+                        <td id="mingpan-hour-nayin">涧下水</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">命格</td>
+                        <td>五行</td>
+                        <td id="mingpan-element-strength">？旺</td>
+                        <td>日元</td>
+                        <td id="mingpan-day-master-strength">旺弱？</td>
+                    </tr>
+                    <tr>
+                        <td>贵人星</td>
+                        <td id="mingpan-noble-star">？颗</td>
+                        <td>姻缘星</td>
+                        <td id="mingpan-marriage-star">？颗</td>
+                    </tr>
+                    <tr>
+                        <td>财帛星</td>
+                        <td id="mingpan-wealth-star">？颗</td>
+                        <td>事业星</td>
+                        <td id="mingpan-career-star">？颗</td>
+                    </tr>
+                </table>
+                
+                <div class="mingpan-pillar-section">
+                    <div class="mingpan-pillar-item">
+                        <div class="mingpan-pillar-label">年柱</div>
+                        <div class="mingpan-pillar-value" id="mingpan-year-pillar-display">辛巳</div>
+                        <div>金火</div>
+                    </div>
+                    <div class="mingpan-pillar-item">
+                        <div class="mingpan-pillar-label">月柱</div>
+                        <div class="mingpan-pillar-value" id="mingpan-month-pillar-display">甲午</div>
+                        <div>木火</div>
+                    </div>
+                    <div class="mingpan-pillar-item">
+                        <div class="mingpan-pillar-label">日柱</div>
+                        <div class="mingpan-pillar-value极" id="mingpan-day-pillar-display">乙丑</div>
+                        <div>木土</极>
+                    </div>
+                    <div class="mingpan-pillar-item">
+                        <div class="mingpan-pillar-label">时柱</div>
+                        <div class="mingpan-pillar-value" id="mingpan-hour-pillar-display">丙子</div>
+                        <div>火水</div>
+                    </div>
+                </div>
+                
+                <div class="mingpan-luck-chart">
+                    <h4 class="mingpan-luck-title">大运走势</h4>
+                    <div id="mingpan-luck-chart-container">
+                        <div class="mingpan-luck-bar" style="width: 30%; background-color: #8b0000;">20-30岁</div>
+                        <div class="mingpan-luck-bar" style="width: 70%; background-color: #d4af37;">30-40岁</div>
+                        <div class="mingpan-luck-bar" style="width: 90%; background-color: #4b0082;">40-50岁</div>
+                        <div class="mingpan-luck-bar" style="width: 60%; background-color: #d4af37;">50-60岁</div>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <div id="result">
-            <!-- 结果将由JavaScript动态填充 -->
+        <div class="mingpan-footer">
+            <p>本命盘根据传统命理学算法生成，结果仅供参考</p>
         </div>
-        
-        <div class="footer">
-            <p>本测算结果仅供参考，命运掌握在自己手中</p>
-        </div>
+    </div>
+    
+    <!-- 这是您现有网站的更多内容 -->
+    <div class="your-existing-content">
+        <p>这是您网站的其他内容...</p>
     </div>
 
     <script>
-        // ==================== 核心算法配置 ====================
-        const heavenlyStems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-        const earthlyBranches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
-        const zodiacAnimals = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
-        
-        const fiveElements = {
-            "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土", 
-            "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水",
-            "子": "水", "丑": "土", "寅": "木", "卯": "木", "辰": "土",
-            "巳": "火", "午": "火", "未": "土", "申": "金", "酉": "金",
-            "戌": "土", "亥": "水"
-        };
-        
-        const tenGodsRelations = {
-            "甲": { "甲": "比肩", "乙": "劫财", "丙": "食神", "丁": "伤官", "戊": "偏财", 
-                   "己": "正财", "庚": "七杀", "辛": "正官", "壬": "偏印", "癸": "正印" },
-            "乙": { "甲": "劫财", "乙": "比肩", "丙": "伤官", "丁": "食神", "戊": "正财", 
-                   "己": "偏财", "庚": "正官", "辛": "七杀", "壬": "正印", "癸": "偏印" },
-            "丙": { "甲": "偏印", "乙": "极印", "丙": "比肩", "丁极": "劫财", "戊": "食神", 
-                   "己": "伤官", "庚": "偏财", "辛": "正极财", "壬": "七杀", "癸": "正官" },
-            "丁": { "甲": "正印", "乙": "偏印", "丙": "劫财", "丁": "比肩", "戊": "伤官", 
-                   "己": "食神", "庚": "正财", "辛": "偏财", "壬": "正官", "癸": "七杀" },
-            "戊": { "甲": "七杀", "乙": "正官", "丙": "偏印", "丁": "正印", "戊": "极比肩", 
-                   "己": "劫财", "庚": "食神", "辛": "伤官", "壬": "偏财", "癸": "正财" },
-            "己": { "甲": "正官", "乙": "七杀", "丙": "正印", "丁": "偏印", "戊": "劫财", 
-                   "己": "比肩", "庚": "伤官", "辛": "食神", "壬": "正财", "癸": "偏财" },
-            "庚": { "甲": "偏财", "乙": "正财", "丙": "七杀", "丁": "正官", "戊": "偏印", 
-                   "己": "正印", "极庚": "比肩", "辛": "劫财", "壬": "食神", "癸": "伤官" },
-            "辛": { "甲": "正财", "乙": "偏财", "丙": "正官", "丁": "七杀", "戊": "正印", 
-                   "己": "偏印", "庚": "劫财", "辛": "比肩", "壬": "伤官", "癸": "食神" },
-            "壬": { "甲": "食神", "乙": "伤官", "丙": "偏财", "丁": "正财", "戊": "七杀", 
-                   "己": "正官", "庚": "偏印", "辛": "正印", "壬": "比肩", "癸": "劫财" },
-            "癸": { "甲": "伤官", "乙极": "食神", "丙": "正财", "丁": "偏财", "戊": "正官", 
-                   "己": "七杀", "庚": "正印", "辛": "偏印", "壬": "劫财", "癸": "比肩" }
-        };
-        
-        const monthStemMap = {
-            "甲": 2, "乙": 4, "丙": 6, "丁": 8, "戊": 0,
-            "己": 2, "庚": 4, "辛": 6, "壬": 8, "癸": 0
-        };
-        
-        const hourStemMap = {
-            "甲": 0, "乙": 2, "丙": 4, "丁": 6, "戊": 8,
-            "己": 0, "庚": 2, "辛": 4, "壬": 6, "癸": 8
-        };
-        
-        // ==================== 专业算法类 ====================
-        class ProfessionalBaziCalculator {
-            calculateYearPillar(year) {
-                const stemIndex = (year - 4) % 10;
-                const branchIndex = (year - 4) % 12;
-                return {
-                    stem: heavenlyStems[stemIndex],
-                    branch: earthlyBranches[branchIndex],
-                    stemIndex: stemIndex,
-                    branchIndex: branchIndex
-                };
-            }
-            
-            calculateMonthPillar(yearPillar, month) {
-                const branchIndex = (month + 1) % 12;
-                const branch = earthlyBranches[branchIndex];
-                
-                const yearStem = yearPillar.stem;
-                const stemStartIndex = monthStemMap[yearStem];
-                const stemIndex = (stemStartIndex + month - 1) % 10;
-                const stem = heavenlyStems[stemIndex];
-                
-                return {
-                    stem: stem,
-                    branch: branch,
-                    stemIndex: stemIndex,
-                    branchIndex: branchIndex
-                };
-            }
-            
-            calculateDayPillar(year, month, day) {
-                const baseDate = new Date(1900, 0, 1);
-                const targetDate = new Date(year, month - 1, day);
-                const diffTime = targetDate - baseDate;
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                
-                const stemIndex = diffDays % 10;
-                const branchIndex = diffDays % 12;
-                
-                return {
-                    stem: heavenlyStems[stemIndex],
-                    branch: earthlyBranches[branchIndex],
-                    stemIndex: stemIndex,
-                    branchIndex: branchIndex
-                };
-            }
-            
-            calculateHourPillar(dayPillar, hour) {
-                const branchIndex = Math.floor(hour / 2) % 12;
-                const branch = earthlyBranches[branchIndex];
-                
-                const dayStem = dayPillar.stem;
-                const stemStartIndex = hourStemMap[dayStem];
-                const stemIndex = (stemStartIndex + Math.floor(hour / 2)) % 10;
-                const stem = heavenlyStems[stemIndex];
-                
-                return {
-                    stem: stem,
-                    branch: branch,
-                    stemIndex: stemIndex,
-                    branchIndex: branchIndex
-                };
-            }
-            
-            calculateTenGods(dayStem, targetStem) {
-                return tenGodsRelations[dayStem]?.[targetStem] || "未知";
-            }
-            
-            analyzeElementsStrength(bazi) {
-                const elementsCount = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
-                
-                Object.values(bazi).forEach(pillar => {
-                    if (pillar.stem && fiveElements[pillar.stem]) {
-                        elementsCount[fiveElements[pillar.stem]]++;
-                    }
-                    if (pillar.branch && fiveElements[pillar.branch]) {
-                        elementsCount[fiveElements[pillar.branch]]++;
-                    }
-                });
-                
-                return elementsCount;
-            }
-            
-            getZodiac(yearBranchIndex) {
-                return zodiacAnimals[yearBranchIndex];
-            }
-            
-            calculateBazi(year, month, day, hour) {
-                const yearPillar = this.calculateYearPillar(year);
-                const monthPillar = this.calculateMonthPillar(yearPillar, month);
-                const dayPillar = this.calculateDayPillar(year, month, day);
-                const hourPillar = this.calculateHourPillar(dayPillar, hour);
-                
-                return {
-                    year: yearPillar,
-                    month: monthPillar,
-                    day: dayPillar,
-                    hour: hourPillar
-                };
-            }
-        }
-        
-        // ==================== 命理解读类 ====================
-        class InterpretationGenerator {
-            constructor() {
-                this.marriageInterpretations = {
-                    "木": "木主仁，其性直，其情和。婚姻方面，木命之人需寻找能够滋养其成长的关系，适合与火、土命人结合。",
-                    "火": "火主礼，其性急，其情恭。感情热烈而直接，需注意控制情绪，避免冲动决策。",
-                    "土": "土主信，其性重，其情厚。重视忠诚与稳定，是可靠的伴侣。",
-                    "金": "金主义，其性刚，其情烈。在感情中需要理解和尊重其独立性。",
-                    "水": "水主智，其性聪，其情善。感情丰富但需稳定感，避免过于多变。"
-                };
-                
-                this.careerInterpretations = {
-                    "木": "适合教育、文化、艺术、医疗等能够发挥仁爱之心的行业。",
-                    "火": "适合能源、娱乐、餐饮、传媒等需要热情和创造力的行业。",
-                    "土": "适合房地产、建筑、农业、管理等需要稳定和耐性的行业。",
-                    "金": "适合金属、金融、法律、机械等需要决断力和原则性的行业。",
-                    "水": "适合贸易、交通、旅游、咨询等需要智慧和流动性的行业。"
-                };
-                
-                this.healthInterpretations = {
-                    "木": "需注意肝胆和神经系统健康，避免过度愤怒。",
-                    "火": "需注意心脏和小肠健康，避免过度喜悦。",
-                    "土": "需注意脾胃和消化系统健康，避免过度思虑。",
-                    "金": "需注意呼吸系统和大肠健康，避免过度忧伤。",
-                    "水": "需注意肾脏和泌尿系统健康，避免过度恐惧。"
-                };
-            }
-            
-            generateMarriageInterpretation(dominantElement) {
-                return this.marriageInterpretations[dominantElement] || "婚姻幸福需要双方共同经营。";
-            }
-            
-            generateCareerInterpretation(dominantElement) {
-                return this.careerInterpretations[dominantElement] || "事业成功需要努力和机遇。";
-            }
-            
-            generateHealthInterpretation(dominantElement) {
-                return this.healthInterpretations[dominantElement] || "保持规律作息和良好心态。";
-            }
-            
-            generateTenGodsInterpretation(tenGods) {
-                let interpretation = "";
-                
-                if (tenGods.includes("正官")) {
-                    interpretation += "正官代表规则与责任，您为人正直，适合在规范环境中发展。";
-                }
-                if (tenGods.includes("七杀")) {
-                    interpretation += "七杀代表魄力与挑战，您有领导才能，能应对压力。";
-                }
-                if (tenGods.includes("正印")) {
-                    interpretation += "正印代表学识与贵人，您学习能力强，易得长辈帮助。";
-                }
-                if (tenGods.includes("偏印")) {
-                    interpretation += "偏印代表独特才华，您有特殊天赋，思维与众不同。";
-                }
-                if (tenGods.includes("正财")) {
-                    interpretation += "正财代表稳定收入，您理财观念强，注重实际收益。";
-                }
-                if (tenGods.includes("偏财")) {
-                    interpretation += "极偏财代表意外之财，您有投资眼光，但需注意风险。";
-                }
-                if (tenGods.includes("食神")) {
-                    interpretation += "食神代表福气与才华，您天性乐观，有艺术天赋。";
-                }
-                if (tenGods.includes("伤官")) {
-                    interpretation += "伤官代表才华与个性，您创意丰富，但需注意人际关系。";
-                }
-                if (tenGods.includes("比肩")) {
-                    interpretation += "比肩代表同辈助力，您重视友情，能得到朋友帮助。";
-                }
-                if (tenGods.includes("劫财")) {
-                    interpretation += "劫财代表竞争意识，您有进取心，但需注意合作纠纷。";
-                }
-                
-                return interpretation || "十神配置均衡，各方面发展较为平衡。";
-            }
-            
-            generateComprehensiveReport(bazi, elementsCount, gender, zodiac) {
-                const maxElement = Object.keys(elementsCount).reduce((a, b) => 
-                    elementsCount[a] > elementsCount[b] ? a : b, "木");
-                
-                return {
-                    marriage: this.generateMarriageInterpretation(maxElement),
-                    career: this.generateCareerInterpretation(maxElement),
-                    health: this.generateHealthInterpretation(maxElement),
-                    zodiac: zodiac,
-                    dominantElement: maxElement
-                };
-            }
-        }
-        
-        // ==================== 页面功能实现 ====================
+        // 生辰命盘功能JavaScript代码
         document.addEventListener('DOMContentLoaded', function() {
-            const calculator = new ProfessionalBaziCalculator();
-            const interpreter = new InterpretationGenerator();
+            // 天干地支定义
+            const heavenlyStems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+            const earthlyBranches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
             
-            const calculateBtn = document.getElementById('calculate-btn');
-            const clearBtn = document.getElementById('clear-btn');
-            const resultDiv = document.getElementById('result');
+            // 纳音五行表
+            const nayinTable = {
+                "甲子": "海中金", "乙丑": "海中金", "丙寅": "炉中火", "丁卯": "炉中火",
+                "戊辰": "大林木", "己极": "大林木", "庚午":极"路旁土", "辛未": "路旁土",
+                "壬申": "剑锋金", "癸酉": "剑锋金", "甲戌": "山头火", "乙亥": "山头火",
+                "丙子": "涧下水", "丁丑": "涧下水", "戊寅": "城头土", "己卯": "城头土",
+                "庚辰": "白蜡金", "辛巳": "白蜡金", "壬午": "杨柳木", "癸未": "杨柳木",
+                "甲申": "泉中水", "乙酉": "泉中水", "丙戌": "屋上土", "丁亥": "屋上极",
+                "戊子": "霹雳火", "己丑": "霹雳火", "庚寅": "松柏木", "辛卯": "松柏木",
+                "壬辰": "长流水", "癸巳": "长流水", "甲午": "砂石金", "乙未": "砂石金",
+                "丙申": "山下火", "丁酉": "山下火", "戊戌": "平地木", "己亥": "平地木",
+                "庚子": "壁上土", "辛丑": "壁上土", "壬寅": "金箔金", "癸卯": "金箔金",
+                "甲辰": "佛灯火", "乙辰": "佛灯火", "丙午": "天河水", "丁未": "天河水",
+                "戊申": "大驿土", "己酉": "大驿土", "庚戌": "钗钏金", "辛亥": "钗钏金",
+                "壬子": "桑柘木", "癸丑": "桑柘木", "甲寅": "大溪水", "乙卯": "大溪水",
+                "丙辰": "沙中土", "丁巳": "沙中土", "戊午": "天上火", "己未极": "天上火",
+                "庚申": "石榴木", "辛酉": "石榴木", "壬戌": "大海水", "癸亥": "大海水"
+            };
             
-            // 测算八字函数
-            calculateBtn.addEventListener('click', function() {
-                const name = document.getElementById('name').value.trim();
-                const gender = document.getElementById('gender').value;
-                const year = parseInt(document.getElementById('year').value);
-                const month = parseInt(document.getElementById('month').value);
-                const day = parseInt(document.getElementById('day').value);
-                const hour = parseInt(document.getElementById('hour').value);
-                
-                // 验证输入
-                if (!name) {
-                    alert('请输入您的姓名！');
-                    return;
+            // 十神关系
+            const tenGodsRelations = {
+                "甲": { "甲": "比肩", "乙": "劫财", "丙": "食神", "丁": "伤官", "戊": "偏财", 
+                       "己": "正财", "庚": "七杀", "辛极": "正官", "壬": "偏印", "癸": "正印" },
+                "乙": { "甲": "劫财", "乙": "比肩", "丙": "伤官", "丁": "食神", "戊":极"正财", 
+                       "己": "偏财", "庚": "正官", "辛": "七杀", "壬": "极印", "癸": "偏印" },
+                "丙": { "甲": "偏印", "乙": "正印", "丙": "比肩", "丁": "劫财", "戊": "食神", 
+                       "己": "伤官", "庚": "偏财", "辛": "正财", "壬": "七杀", "癸": "正官" },
+                "丁": { "甲": "正印", "乙": "偏印", "丙": "劫财", "丁": "比肩", "戊": "伤官", 
+                       "己": "食神", "庚": "正财", "辛": "偏财", "壬": "正官", "癸": "七杀" },
+                "戊": { "甲": "七杀", "乙": "正官", "丙": "偏印", "丁": "正印", "戊": "比肩", 
+                       "己": "劫财", "庚": "食神", "辛": "伤官", "壬": "偏财", "癸": "正极" },
+                "己": { "甲": "正官", "乙": "七杀", "丙": "正印", "丁": "偏印", "戊": "劫财", 
+                       "己": "比肩", "庚": "伤官", "辛": "食神极", "壬": "正财", "癸": "偏财" },
+                "庚": { "甲": "偏财", "乙": "正财", "丙": "七杀", "丁": "正官", "戊": "偏印", 
+                       "己": "正印", "庚": "比肩", "辛": "劫财", "壬": "食神", "癸": "伤官" },
+                "辛": { "甲": "正财", "乙": "偏财", "丙": "正官", "丁": "七杀", "戊": "正印", 
+                       "己": "偏印", "庚": "劫财", "辛": "比肩", "壬": "伤官", "癸": "食神" },
+                "壬": { "甲": "食神", "乙": "伤官", "丙": "偏财", "丁": "正财", "戊": "七杀", 
+                       "己": "正官", "庚": "偏印", "辛": "正印", "壬": "比肩", "癸": "劫财" },
+                "癸": { "甲": "伤官", "乙": "食神", "丙": "正财", "丁": "偏财", "戊": "正官", 
+                       "己": "七杀", "庚": "正印", "辛": "偏印", "壬": "劫财", "癸": "比肩" }
+            };
+            
+            // 五行属性
+            const fiveElements = {
+                "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土", 
+                "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水",
+                "子": "水", "丑": "土", "寅": "木", "卯": "木", "辰": "土",
+                "巳": "火", "午": "火", "未": "土", "申": "金", "酉": "金",
+                "戌": "极", "亥": "水"
+            };
+            
+            // 专业八字排盘类
+            class DestinyChartGenerator {
+                constructor() {
+                    this.heavenlyStems = heavenlyStems;
+                    this.earthlyBranches = earthlyBranches;
+                    this.nayinTable = nayinTable;
+                    this.tenGodsRelations = tenGodsRelations;
+                    this.fiveElements = fiveElements;
                 }
                 
-                if (!year || year < 1900 || year > new Date().getFullYear()) {
-                    alert('请输入有效的出生年份（1900-当前年份）！');
-                    return;
-                }
-                
-                if (!month || month < 1 || month > 12) {
-                    alert('请输入有效的出生月份（1-12）！');
-                    return;
-                }
-                
-                if (!day || day < 1 || day > 31) {
-                    alert('请输入有效的出生日期（1-31）！');
-                    return;
-                }
-                
-                // 显示加载状态
-                calculateBtn.disabled = true;
-                calculateBtn.textContent = '测算中...';
-                resultDiv.style.display = 'block';
-                resultDiv.innerHTML = '<div class="loading">🔄 AI大师正在排盘测算中，请静心片刻...</div>';
-                
-                // 模拟计算过程
-                setTimeout(() => {
-                    try {
-                        // 计算八字
-                        const bazi = calculator.calculateBazi(year, month, day, hour);
-                        
-                        // 分析五行
-                        const elementsCount = calculator.analyzeElementsStrength(bazi);
-                        
-                        // 获取生肖
-                        const zodiac = calculator.getZodiac(bazi.year.branchIndex);
-                        
-                        // 计算十神
-                        const tenGods = [
-                            calculator.calculateTenGods(bazi.day.stem, bazi.year.stem),
-                            calculator.calculateTenGods(bazi.day.stem, bazi.month.stem),
-                            calculator.calculateTenGods(bazi.day.stem, bazi.hour.stem)
-                        ];
-                        
-                        // 生成解读
-                        const interpretation = interpreter.generateComprehensiveReport(
-                            bazi, elementsCount, gender, zodiac
-                        );
-                        
-                        // 生成十神解读
-                        const tenGodsInterpretation = interpreter.generateTenGodsInterpretation(tenGods);
-                        
-                        // 生成五行图表
-                        const elementsChart = generateElementsChart(elementsCount);
-                        
-                        // 显示结果
-                        resultDiv.innerHTML = `
-                            <h3>${name}（${gender}）的八字排盘</h3>
-                            <p><strong>生辰信息：</strong>${year}年${month}月${day}日 ${document.getElementById('hour').options[document.getElementById('hour').selectedIndex].text}</p>
-                            <p><strong>生肖：</strong>${zodiac}</p>
-                            
-                            <div class="bazi-grid">
-                                <div class="bazi-pillar">
-                                    <div class="pillar-label">年柱</div>
-                                    <div class="pillar-value">${bazi.year.stem}${bazi.year.branch}</div>
-                                    <div>${fiveElements[bazi.year.stem]}${fiveElements[bazi.year.branch]}</div>
-                                </div>
-                                <div class="bazi-pillar">
-                                    <div class="pillar-label">月柱</div>
-                                    <div class="pillar-value">${bazi.month.stem}${bazi.month.branch}</div>
-                                    <div>${fiveElements[bazi.month.stem]}${fiveElements[bazi.month.branch]}</div>
-                                </div>
-                                <div class="bazi-pillar">
-                                    <div class="pillar-label">日柱</div>
-                                    <div class="pillar-value">${bazi.day.stem}${bazi.day.branch}</div>
-                                    <div>${fiveElements[bazi.day.stem]}${fiveElements[bazi.day.branch]}</div>
-                                </div>
-                                <div class="bazi-pillar">
-                                    <div class="pillar-label">时柱</div>
-                                    <div class="pillar-value">${bazi.hour.stem}极${bazi.hour.branch}</div>
-                                    <div>${fiveElements[bazi.hour.stem]}${fiveElements[bazi.hour.branch]}</div>
-                                </div>
-                            </div>
-                            
-                            <div class="interpretation-section">
-                                <h4>📊 五行能量分析</h4>
-                                ${elementsChart}
-                            </div>
-                            
-                            <div class="interpretation-section">
-                                <h4>⚖️ 十神配置</h4>
-                                <div class="ten-gods-grid">
-                                    <div class="ten-god-item">年柱：${tenGods[0]}</div>
-                                    <div class="ten-god-item">月柱：${tenGods[1]}</div>
-                                    <div class="ten-god-item">时柱：${tenGods[2]}</div>
-                                </div>
-                                <p>${tenGodsInterpretation}</p>
-                            </div>
-                            
-                            <div class="interpretation-section">
-                                <h4>💍 婚姻情感</h4>
-                                <p>${interpretation.marriage}</p>
-                            </div>
-                            
-                            <div class="interpretation-section">
-                                <h4>💼 事业财运</h4>
-                                <p>${interpretation.career}</p>
-                                <p>日主${bazi.day.stem}${fiveElements[bazi.day.stem]}，${gender === '男' ? '阳刚' : '阴柔'}之气充沛，在事业上${fiveElements[bazi.day.stem] === '木' ? '正直仁厚' : 
-                                     fiveElements[bazi.day.stem] === '火' ? '热情礼貌' :
-                                     fiveElements[bazi.day.stem] === '土' ? '诚信稳重' :
-                                     fiveElements[bazi.day.stem] === '金' ? '刚毅果断' : '智慧聪明'}。</p>
-                            </div>
-                            
-                            <div class="interpretation-section">
-                                <h4>🌱 健康养生</h4>
-                                <p>${interpretation.health}</p>
-                                <p>建议注重${fiveElements[bazi.day.stem] === '木' ? '肝胆' : 
-                                     fiveElements[bazi.day.stem] === '火' ? '心脏' :
-                                     fiveElements[bazi.day.stem] === '土' ? '脾胃' :
-                                     fiveElements[bazi.day.stem] === '金' ? '肺肠' : '肾脏'}系统的保养，保持情绪稳定和规律作息。</p>
-                            </div>
-                            
-                            <div class="footer">
-                                <p>※ 以上内容根据传统命理学生成，仅供参考 ※</p>
-                            </div>
-                        `;
-                    } catch (error) {
-                        console.error('测算错误:', error);
-                        resultDiv.innerHTML = '<div class="error">❌ 测算过程中出现错误，请检查输入信息后重试</div>';
-                    } finally {
-                        calculateBtn.disabled = false;
-                        calculateBtn.textContent = '测算八字';
-                    }
-                }, 1500);
-            });
-            
-            // 生成五行图表
-            function generateElementsChart(elementsCount) {
-                const maxCount = Math.max(...Object.values(elementsCount));
-                const colors = {
-                    '木': '#4caf50',
-                    '火': '#f44336',
-                    '土': '#ff9800',
-                    '金': '#ffeb3b',
-                    '水': '#2196f3'
-                };
-                
-                let chartHTML = '<div class="element-chart">';
-                for (const element in elementsCount) {
-                    const height = maxCount > 0 ? (elementsCount[element] / maxCount) * 100 : 0;
-                    chartHTML += `
-                        <div class="element-bar" style="height: ${height}%">
-                            <div class="element-label">${element}(${elementsCount[element]})</div>
-                        </div>
-                    `;
-                }
-                chartHTML += '</div>';
-                
-                return chartHTML;
-            }
-            
-            // 清空按钮事件
-            clearBtn.addEventListener('click', function() {
-                document.getElementById('name').value = '';
-                document.getElementById('year').value = '';
-                document.getElementById('month').value = '';
-                document.getElementById('day').value = '';
-                document.getElementById('hour').value = '0';
-                resultDiv.style.display = 'none';
-                resultDiv.innerHTML = '';
-            });
-            
-            // 页面加载后自动聚焦到姓名输入框
-            window.addEventListener('load', function() {
-                document.getElementById('name').focus();
-            });
-        });
-    </script>
-</body>
-</html>
+                // 计算年柱
+                calculateYearPillar(year) {
+                    const stemIndex = (year - 4) % 10;
+                    const branchIndex = (year - 4) % 12;
+                    return {
+                        stem: this.heavenlyStems[stemIndex],
+                        branch: this.earthlyBranches[branchIndex],
+                        stemIndex: stemIndex,
+                        branchIndex
