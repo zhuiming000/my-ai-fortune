@@ -102,7 +102,6 @@
             display: flex;
             align-items: center;
             cursor: pointer;
-            font-weight: bold;
         }
         
         .calendar-type input {
@@ -206,7 +205,7 @@
         
         .bazi-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(4, 1fr');
             gap: 10px;
             margin: 15px 0;
         }
@@ -266,6 +265,44 @@
             color: #7a6a5a;
         }
         
+        .ten-gods-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin: 10px 0;
+        }
+        
+        .ten-god-item {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .element-chart {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            height: 30px;
+        }
+        
+        .element-bar {
+            flex: 1;
+            margin: 0 2px;
+            border-radius: 3px;
+            position: relative;
+        }
+        
+        .element-label {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+        }
+        
         @media (max-width: 600px) {
             .form-row {
                 flex-direction: column;
@@ -282,6 +319,10 @@
             .bazi-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+            
+            .ten-gods-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
     </style>
 </head>
@@ -289,7 +330,7 @@
     <div class="container">
         <div class="yin-yang"></div>
         <h1>八字命理测算大师</h1>
-        <p class="subtitle">请输入您的出生信息，获取精准八字排盘与命理解读</p>
+        <p class="subtitle">请输入您的出生信息，获取精准八字排盘与专业命理解读</p>
         
         <div class="calendar-type">
             <label>
@@ -379,7 +420,7 @@
             "戌": "土", "亥": "水"
         };
         
-        // 十神关系
+        // 十神关系定义
         const tenGodsRelations = {
             "甲": { "甲": "比肩", "乙": "劫财", "丙": "食神", "丁": "伤官", "戊": "偏财", 
                    "己": "正财", "庚": "七杀", "辛": "正官", "壬": "偏印", "癸": "正印" },
@@ -403,18 +444,16 @@
                    "己": "七杀", "庚": "正印", "辛": "偏印", "壬": "劫财", "癸": "比肩" }
         };
         
-        // 生肖对应
-        const zodiacAnimals = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
+        // 月柱计算映射（五虎遁诀）
+        const monthStemMap = {
+            "甲": 2, "乙": 4, "丙": 6, "丁": 8, "戊": 0,
+            "己": 2, "庚": 4, "辛": 6, "壬": 8, "癸": 0
+        };
         
-        // 节气数据（简化版，实际应使用精确计算）
-        const solarTerms = {
-            // 立春、惊蛰等节气对应的日期（简化处理）
-            2024: {
-                "立春": "2024-02-04", "惊蛰": "2024-03-05", "清明": "2024-04-04",
-                "立夏": "2024-05-05", "芒种": "2024-06-05", "小暑": "2024-07-07",
-                "立秋": "2024-08-07", "白露": "2024-09-07", "寒露": "2024-10-08",
-                "立冬": "2024-11-07", "大雪": "2024-12-07", "小寒": "2024-01-06"
-            }
+        // 时柱计算映射（五鼠遁诀）
+        const hourStemMap = {
+            "甲": 0, "乙": 2, "丙": 4, "丁": 6, "戊": 8,
+            "己": 0, "庚": 2, "辛": 4, "壬": 6, "癸": 8
         };
         
         // 专业八字排盘类
@@ -424,21 +463,11 @@
                 this.earthlyBranches = earthlyBranches;
             }
             
-            // 1. 计算年柱（以立春为界）[1](@ref)
-            calculateYearPillar(year, month, day) {
-                // 判断是否在立春之前
-                const springStart = this.getSpringStart(year);
-                const birthDate = new Date(year, month - 1, day);
-                
-                // 如果出生日期在立春之前，年柱用上一年
-                if (birthDate < springStart) {
-                    year -= 1;
-                }
-                
-                // 天干算法：年份尾数对应
-                const stemIndex = (year - 4) % 10;
-                const branchIndex = (year - 4) % 12;
-                
+            // 计算年柱
+            calculateYearPillar(year) {
+                // 年柱计算：(年份-3) % 10 为天干，(年份-3) % 12 为地支 [1](@ref)
+                const stemIndex = (year - 3) % 10;
+                const branchIndex = (year - 3) % 12;
                 return {
                     stem: this.heavenlyStems[stemIndex],
                     branch: this.earthlyBranches[branchIndex],
@@ -447,37 +476,30 @@
                 };
             }
             
-            // 2. 计算月柱（严格按节气）[1](@ref)
-            calculateMonthPillar(year, month, day, yearStemIndex) {
-                // 获取当前月的节气信息
-                const termInfo = this.getSolarTermInfo(year, month, day);
-                let monthIndex = termInfo.monthIndex;
+            // 计算月柱
+            calculateMonthPillar(yearPillar, month) {
+                // 月柱地支固定：正月为寅，二月为卯，以此类推 [1](@ref)
+                const branchIndex = (month + 1) % 12; // 调整索引
+                const branch = this.earthlyBranches[branchIndex];
                 
-                // 月干根据年干确定（五虎遁诀）[1](@ref)
-                let monthStemIndex;
-                if (yearStemIndex === 0 || yearStemIndex === 5) { // 甲或己年
-                    monthStemIndex = (2 + monthIndex - 1) % 10; // 丙寅月起
-                } else if (yearStemIndex === 1 || yearStemIndex === 6) { // 乙或庚年
-                    monthStemIndex = (4 + monthIndex - 1) % 10; // 戊寅月起
-                } else if (yearStemIndex === 2 || yearStemIndex === 7) { // 丙或辛年
-                    monthStemIndex = (6 + monthIndex - 1) % 10; // 庚寅月起
-                } else if (yearStemIndex === 3 || yearStemIndex === 8) { // 丁或壬年
-                    monthStemIndex = (8 + monthIndex - 1) % 10; // 壬寅月起
-                } else { // 戊或癸年
-                    monthStemIndex = (0 + monthIndex - 1) % 10; // 甲寅月起
-                }
+                // 月柱天干根据年干确定（五虎遁诀） [1](@ref)
+                const yearStem = yearPillar.stem;
+                const stemStartIndex = monthStemMap[yearStem];
+                const stemIndex = (stemStartIndex + month - 1) % 10;
+                const stem = this.heavenlyStems[stemIndex];
                 
                 return {
-                    stem: this.heavenlyStems[monthStemIndex],
-                    branch: this.earthlyBranches[monthIndex],
-                    stemIndex: monthStemIndex,
-                    branchIndex: monthIndex
+                    stem: stem,
+                    branch: branch,
+                    stemIndex: stemIndex,
+                    branchIndex: branchIndex
                 };
             }
             
-            // 3. 计算日柱（简化公式法）[8](@ref)
+            // 计算日柱（简化版，实际应使用更精确的算法）
             calculateDayPillar(year, month, day) {
-                // 简化日柱计算（实际应使用更精确的算法或万年历）
+                // 使用简化公式计算日柱（实际应使用更精确的算法如蔡勒公式） [1](@ref)
+                // 这里使用一个简化版本，实际应用中应使用更精确的算法
                 const baseDate = new Date(1900, 0, 1);
                 const targetDate = new Date(year, month - 1, day);
                 const diffTime = targetDate - baseDate;
@@ -494,59 +516,36 @@
                 };
             }
             
-            // 4. 计算时柱（日上起时法）[1](@ref)
-            calculateHourPillar(dayStemIndex, hour) {
-                // 时支直接对应
-                const hourBranchIndex = hour % 12;
+            // 计算时柱
+            calculateHourPillar(dayPillar, hour) {
+                // 时柱地支：每两小时为一个时辰 [1](@ref)
+                const branchIndex = Math.floor(hour / 2) % 12;
+                const branch = this.earthlyBranches[branchIndex];
                 
-                // 时干根据日干确定（五鼠遁诀）[1](@ref)
-                let hourStemIndex;
-                if (dayStemIndex === 0 || dayStemIndex === 5) { // 甲或己日
-                    hourStemIndex = (0 + hourBranchIndex) % 10; // 甲子时起
-                } else if (dayStemIndex === 1 || dayStemIndex === 6) { // 乙或庚日
-                    hourStemIndex = (2 + hourBranchIndex) % 10; // 丙子时起
-                } else if (dayStemIndex === 2 || dayStemIndex === 7) { // 丙或辛日
-                    hourStemIndex = (4 + hourBranchIndex) % 10; // 戊子时起
-                } else if (dayStemIndex === 3 || dayStemIndex === 8) { // 丁或壬日
-                    hourStemIndex = (6 + hourBranchIndex) % 10; // 庚子时起
-                } else { // 戊或癸日
-                    hourStemIndex = (8 + hourBranchIndex) % 10; // 壬子时起
-                }
+                // 时柱天干根据日干确定（五鼠遁诀） [1](@ref)
+                const dayStem = dayPillar.stem;
+                const stemStartIndex = hourStemMap[dayStem];
+                const stemIndex = (stemStartIndex + Math.floor(hour / 2)) % 10;
+                const stem = this.heavenlyStems[stemIndex];
                 
                 return {
-                    stem: this.heavenlyStems[hourStemIndex],
-                    branch: this.earthlyBranches[hourBranchIndex],
-                    stemIndex: hourStemIndex,
-                    branchIndex: hourBranchIndex
+                    stem: stem,
+                    branch: branch,
+                    stemIndex: stemIndex,
+                    branchIndex: branchIndex
                 };
             }
             
-            // 5. 获取立春日期（简化版）
-            getSpringStart(year) {
-                // 简化处理：立春通常在2月3-5日
-                return new Date(year, 1, 4); // 2月4日
-            }
-            
-            // 6. 获取节气信息（简化版）
-            getSolarTermInfo(year, month, day) {
-                // 简化处理：实际应使用精确的节气计算
-                // 这里返回大致的月份索引
-                return {
-                    monthIndex: month - 1,
-                    termName: "立春" // 示例
-                };
-            }
-            
-            // 7. 计算十神关系[3](@ref)
+            // 计算十神
             calculateTenGods(dayStem, targetStem) {
                 return tenGodsRelations[dayStem]?.[targetStem] || "未知";
             }
             
-            // 8. 分析五行强弱
-            analyzeElements(bazi) {
+            // 分析五行旺衰
+            analyzeElementsStrength(bazi) {
                 const elementsCount = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
                 
-                // 统计天干地支五行
+                // 统计天干地支五行 [6](@ref)
                 Object.values(bazi).forEach(pillar => {
                     if (pillar.stem && fiveElements[pillar.stem]) {
                         elementsCount[fiveElements[pillar.stem]]++;
@@ -559,17 +558,31 @@
                 return elementsCount;
             }
             
-            // 9. 获取生肖[1](@ref)
-            getZodiac(yearBranchIndex) {
-                return zodiacAnimals[yearBranchIndex];
+            // 判断日主旺衰（简化版） [10](@ref)
+            analyzeStrength(bazi, elementsCount) {
+                // 简化旺衰判断：根据五行数量
+                const dayStemElement = fiveElements[bazi.day.stem];
+                const dayElementCount = elementsCount[dayStemElement];
+                
+                const totalElements = Object.values(elementsCount).reduce((a, b) => a + b, 0);
+                const percentage = (dayElementCount / totalElements) * 100;
+                
+                if (percentage > 30) return "身旺";
+                if (percentage < 20) return "身弱";
+                return "中和";
             }
             
-            // 10. 综合八字排盘
+            // 获取生肖
+            getZodiac(yearBranchIndex) {
+                return this.earthlyBranches[yearBranchIndex];
+            }
+            
+            // 综合八字排盘
             calculateBazi(year, month, day, hour) {
-                const yearPillar = this.calculateYearPillar(year, month, day);
-                const monthPillar = this.calculateMonthPillar(year, month, day, yearPillar.stemIndex);
+                const yearPillar = this.calculateYearPillar(year);
+                const monthPillar = this.calculateMonthPillar(yearPillar, month);
                 const dayPillar = this.calculateDayPillar(year, month, day);
-                const hourPillar = this.calculateHourPillar(dayPillar.stemIndex, hour);
+                const hourPillar = this.calculateHourPillar(dayPillar, hour);
                 
                 return {
                     year: yearPillar,
@@ -623,8 +636,46 @@
                 return this.healthInterpretations[dominantElement] || "保持规律作息和良好心态。";
             }
             
+            // 生成十神解读
+            generateTenGodsInterpretation(tenGods) {
+                let interpretation = "";
+                
+                if (tenGods.includes("正官")) {
+                    interpretation += "正官代表规则与责任，您为人正直，适合在规范环境中发展。";
+                }
+                if (tenGods.includes("七杀")) {
+                    interpretation += "七杀代表魄力与挑战，您有领导才能，能应对压力。";
+                }
+                if (tenGods.includes("正印")) {
+                    interpretation += "正印代表学识与贵人，您学习能力强，易得长辈帮助。";
+                }
+                if (tenGods.includes("偏印")) {
+                    interpretation += "偏印代表独特才华，您有特殊天赋，思维与众不同。";
+                }
+                if (tenGods.includes("正财")) {
+                    interpretation += "正财代表稳定收入，您理财观念强，注重实际收益。";
+                }
+                if (tenGods.includes("偏财")) {
+                    interpretation += "偏财代表意外之财，您有投资眼光，但需注意风险。";
+                }
+                if (tenGods.includes("食神")) {
+                    interpretation += "食神代表福气与才华，您天性乐观，有艺术天赋。";
+                }
+                if (tenGods.includes("伤官")) {
+                    interpretation += "伤官代表才华与个性，您创意丰富，但需注意人际关系。";
+                }
+                if (tenGods.includes("比肩")) {
+                    interpretation += "比肩代表同辈助力，您重视友情，能得到朋友帮助。";
+                }
+                if (tenGods.includes("劫财")) {
+                    interpretation += "劫财代表竞争意识，您有进取心，但需注意合作纠纷。";
+                }
+                
+                return interpretation || "十神配置均衡，各方面发展较为平衡。";
+            }
+            
             // 生成综合命理报告
-            generateComprehensiveReport(bazi, elementsCount, gender, zodiac) {
+            generateComprehensiveReport(bazi, elementsCount, strength, gender, zodiac) {
                 // 找出最多的五行
                 const maxElement = Object.keys(elementsCount).reduce((a, b) => 
                     elementsCount[a] > elementsCount[b] ? a : b, "木");
@@ -634,7 +685,8 @@
                     career: this.generateCareerInterpretation(maxElement),
                     health: this.generateHealthInterpretation(maxElement),
                     zodiac: zodiac,
-                    dominantElement: maxElement
+                    dominantElement: maxElement,
+                    strength: strength
                 };
             }
         }
@@ -648,7 +700,6 @@
             const calculateBtn = document.getElementById('calculate-btn');
             const clearBtn = document.getElementById('clear-btn');
             const resultDiv = document.getElementById('result');
-            const calendarTypeRadios = document.querySelectorAll('input[name="calendar-type"]');
             
             // 测算八字函数
             calculateBtn.addEventListener('click', function() {
@@ -684,7 +735,7 @@
                 calculateBtn.disabled = true;
                 calculateBtn.textContent = '测算中...';
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = '<div class="loading">🔄 正在排盘测算中，请稍候...</div>';
+                resultDiv.innerHTML = '<div class="loading">🔄 AI大师正在排盘测算中，请静心片刻...</div>';
                 
                 // 模拟计算过程
                 setTimeout(() => {
@@ -693,21 +744,37 @@
                         const bazi = calculator.calculateBazi(year, month, day, hour);
                         
                         // 分析五行
-                        const elementsCount = calculator.analyzeElements(bazi);
+                        const elementsCount = calculator.analyzeElementsStrength(bazi);
+                        
+                        // 判断旺衰
+                        const strength = calculator.analyzeStrength(bazi, elementsCount);
                         
                         // 获取生肖
                         const zodiac = calculator.getZodiac(bazi.year.branchIndex);
                         
+                        // 计算十神
+                        const tenGods = [
+                            calculator.calculateTenGods(bazi.day.stem, bazi.year.stem),
+                            calculator.calculateTenGods(bazi.day.stem, bazi.month.stem),
+                            calculator.calculateTenGods(bazi.day.stem, bazi.hour.stem)
+                        ];
+                        
                         // 生成解读
                         const interpretation = interpreter.generateComprehensiveReport(
-                            bazi, elementsCount, gender, zodiac
+                            bazi, elementsCount, strength, gender, zodiac
                         );
+                        
+                        // 生成十神解读
+                        const tenGodsInterpretation = interpreter.generateTenGodsInterpretation(tenGods);
+                        
+                        // 显示五行图表
+                        const elementsChart = generateElementsChart(elementsCount);
                         
                         // 显示结果
                         resultDiv.innerHTML = `
                             <h3>${name}（${gender}）的八字排盘</h3>
-                            <p><strong>生辰信息：</strong>${year}年${month}月${day}日</p>
-                            <p><strong>生肖：</strong>${zodiac}</p>
+                            <p><strong>生辰信息：</strong>${year}年${month}月${day}日 ${document.getElementById('hour').options[document.getElementById('hour').selectedIndex].text}</p>
+                            <p><strong>生肖：</strong>${zodiac} | <strong>日主旺衰：</strong>${strength}</p>
                             
                             <div class="bazi-grid">
                                 <div class="bazi-pillar">
@@ -733,6 +800,21 @@
                             </div>
                             
                             <div class="interpretation-section">
+                                <h4>📊 五行强弱分析</h4>
+                                ${elementsChart}
+                            </div>
+                            
+                            <div class="interpretation-section">
+                                <h4>⚖️ 十神配置</h4>
+                                <div class="ten-gods-grid">
+                                    <div class="ten-god-item">年柱：${tenGods[0]}</div>
+                                    <div class="ten-god-item">月柱：${tenGods[1]}</div>
+                                    <div class="ten-god-item">时柱：${tenGods[2]}</div>
+                                </div>
+                                <p>${tenGodsInterpretation}</p>
+                            </div>
+                            
+                            <div class="interpretation-section">
                                 <h4>💍 婚姻情感</h4>
                                 <p>${interpretation.marriage}</p>
                             </div>
@@ -743,7 +825,7 @@
                                 <p>日主${bazi.day.stem}${fiveElements[bazi.day.stem]}，${gender === '男' ? '阳刚' : '阴柔'}之气充沛，在事业上${fiveElements[bazi.day.stem] === '木' ? '正直仁厚' : 
                                      fiveElements[bazi.day.stem] === '火' ? '热情礼貌' :
                                      fiveElements[bazi.day.stem] === '土' ? '诚信稳重' :
-                                     fiveElements[bazi.day.stem] === '金' ? '刚毅果断' : '智慧聪明'}，容易在相关领域取得成就。</p>
+                                     fiveElements[bazi.day.stem] === '金' ? '刚毅果断' : '智慧聪明'}。</p>
                             </div>
                             
                             <div class="interpretation-section">
@@ -769,7 +851,32 @@
                 }, 1500);
             });
             
-            // 清空输入函数
+            // 生成五行图表
+            function generateElementsChart(elementsCount) {
+                const maxCount = Math.max(...Object.values(elementsCount));
+                const colors = {
+                    '木': '#4caf50',
+                    '火': '#f44336',
+                    '土': '#ff9800',
+                    '金': '#ffeb3b',
+                    '水': '#2196f3'
+                };
+                
+                let chartHTML = '<div class="element-chart">';
+                for (const element in elementsCount) {
+                    const height = maxCount > 0 ? (elementsCount[element] / maxCount) * 100 : 0;
+                    chartHTML += `
+                        <div class="element-bar" style="background-color: ${colors[element]}; height: ${height}%">
+                            <div class="element-label">${element}(${elementsCount[element]})</div>
+                        </div>
+                    `;
+                }
+                chartHTML += '</div>';
+                
+                return chartHTML;
+            }
+            
+            // 清空按钮事件
             clearBtn.addEventListener('click', function() {
                 document.getElementById('name').value = '';
                 document.getElementById('year').value = '';
@@ -780,24 +887,9 @@
                 resultDiv.innerHTML = '';
             });
             
-            // 日历类型切换
-            calendarTypeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const type = this.value;
-                    const yearLabel = document.querySelector('label[for="year"]');
-                    const monthLabel = document.querySelector('label[for="month"]');
-                    const dayLabel = document.querySelector('label[for="day"]');
-                    
-                    if (type === 'lunar') {
-                        yearLabel.textContent = '农历年份';
-                        monthLabel.textContent = '农历月份';
-                        dayLabel.textContent = '农历日期';
-                    } else {
-                        yearLabel.textContent = '出生年份';
-                        monthLabel.textContent = '出生月份';
-                        dayLabel.textContent = '出生日期';
-                    }
-                });
+            // 页面加载后自动聚焦到姓名输入框
+            window.addEventListener('load', function() {
+                document.getElementById('name').focus();
             });
         });
     </script>
