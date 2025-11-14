@@ -205,7 +205,7 @@
         
         .bazi-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr');
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             margin: 15px 0;
         }
@@ -245,6 +245,47 @@
             padding-bottom: 5px;
         }
         
+        .element-chart {
+            display: flex;
+            height: 40px;
+            margin: 15px 0;
+            gap: 5px;
+            align-items: end;
+        }
+        
+        .element-bar {
+            flex: 1;
+            background: linear-gradient(to top, #d4a76a, #8b0000);
+            border-radius: 3px 3px 0 0;
+            position: relative;
+            min-height: 5px;
+        }
+        
+        .element-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: #5a3921;
+        }
+        
+        .ten-gods-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .ten-god-item {
+            padding: 8px;
+            background: rgba(139, 0, 0, 0.1);
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
         .loading {
             text-align: center;
             color: #8b0000;
@@ -265,44 +306,6 @@
             color: #7a6a5a;
         }
         
-        .ten-gods-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-            margin: 10px 0;
-        }
-        
-        .ten-god-item {
-            text-align: center;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        
-        .element-chart {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            height: 30px;
-        }
-        
-        .element-bar {
-            flex: 1;
-            margin: 0 2px;
-            border-radius: 3px;
-            position: relative;
-        }
-        
-        .element-label {
-            position: absolute;
-            bottom: -20px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 12px;
-        }
-        
         @media (max-width: 600px) {
             .form-row {
                 flex-direction: column;
@@ -321,7 +324,7 @@
             }
             
             .ten-gods-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -407,11 +410,11 @@
     </div>
 
     <script>
-        // 天干地支定义
+        // ==================== 核心算法配置 ====================
         const heavenlyStems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
         const earthlyBranches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+        const zodiacAnimals = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
         
-        // 五行属性
         const fiveElements = {
             "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土", 
             "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水",
@@ -420,73 +423,60 @@
             "戌": "土", "亥": "水"
         };
         
-        // 十神关系定义
         const tenGodsRelations = {
             "甲": { "甲": "比肩", "乙": "劫财", "丙": "食神", "丁": "伤官", "戊": "偏财", 
                    "己": "正财", "庚": "七杀", "辛": "正官", "壬": "偏印", "癸": "正印" },
             "乙": { "甲": "劫财", "乙": "比肩", "丙": "伤官", "丁": "食神", "戊": "正财", 
                    "己": "偏财", "庚": "正官", "辛": "七杀", "壬": "正印", "癸": "偏印" },
-            "丙": { "甲": "偏印", "乙": "正印", "丙": "比肩", "丁": "劫财", "戊": "食神", 
-                   "己": "伤官", "庚": "偏财", "辛": "正财", "壬": "七杀", "癸": "正官" },
+            "丙": { "甲": "偏印", "乙": "极印", "丙": "比肩", "丁极": "劫财", "戊": "食神", 
+                   "己": "伤官", "庚": "偏财", "辛": "正极财", "壬": "七杀", "癸": "正官" },
             "丁": { "甲": "正印", "乙": "偏印", "丙": "劫财", "丁": "比肩", "戊": "伤官", 
                    "己": "食神", "庚": "正财", "辛": "偏财", "壬": "正官", "癸": "七杀" },
-            "戊": { "甲": "七杀", "乙": "正官", "丙": "偏印", "丁": "正印", "戊": "比肩", 
+            "戊": { "甲": "七杀", "乙": "正官", "丙": "偏印", "丁": "正印", "戊": "极比肩", 
                    "己": "劫财", "庚": "食神", "辛": "伤官", "壬": "偏财", "癸": "正财" },
             "己": { "甲": "正官", "乙": "七杀", "丙": "正印", "丁": "偏印", "戊": "劫财", 
                    "己": "比肩", "庚": "伤官", "辛": "食神", "壬": "正财", "癸": "偏财" },
             "庚": { "甲": "偏财", "乙": "正财", "丙": "七杀", "丁": "正官", "戊": "偏印", 
-                   "己": "正印", "庚": "比肩", "辛": "劫财", "壬": "食神", "癸": "伤官" },
+                   "己": "正印", "极庚": "比肩", "辛": "劫财", "壬": "食神", "癸": "伤官" },
             "辛": { "甲": "正财", "乙": "偏财", "丙": "正官", "丁": "七杀", "戊": "正印", 
                    "己": "偏印", "庚": "劫财", "辛": "比肩", "壬": "伤官", "癸": "食神" },
             "壬": { "甲": "食神", "乙": "伤官", "丙": "偏财", "丁": "正财", "戊": "七杀", 
                    "己": "正官", "庚": "偏印", "辛": "正印", "壬": "比肩", "癸": "劫财" },
-            "癸": { "甲": "伤官", "乙": "食神", "丙": "正财", "丁": "偏财", "戊": "正官", 
+            "癸": { "甲": "伤官", "乙极": "食神", "丙": "正财", "丁": "偏财", "戊": "正官", 
                    "己": "七杀", "庚": "正印", "辛": "偏印", "壬": "劫财", "癸": "比肩" }
         };
         
-        // 月柱计算映射（五虎遁诀）
         const monthStemMap = {
             "甲": 2, "乙": 4, "丙": 6, "丁": 8, "戊": 0,
             "己": 2, "庚": 4, "辛": 6, "壬": 8, "癸": 0
         };
         
-        // 时柱计算映射（五鼠遁诀）
         const hourStemMap = {
             "甲": 0, "乙": 2, "丙": 4, "丁": 6, "戊": 8,
             "己": 0, "庚": 2, "辛": 4, "壬": 6, "癸": 8
         };
         
-        // 专业八字排盘类
+        // ==================== 专业算法类 ====================
         class ProfessionalBaziCalculator {
-            constructor() {
-                this.heavenlyStems = heavenlyStems;
-                this.earthlyBranches = earthlyBranches;
-            }
-            
-            // 计算年柱
             calculateYearPillar(year) {
-                // 年柱计算：(年份-3) % 10 为天干，(年份-3) % 12 为地支 [1](@ref)
-                const stemIndex = (year - 3) % 10;
-                const branchIndex = (year - 3) % 12;
+                const stemIndex = (year - 4) % 10;
+                const branchIndex = (year - 4) % 12;
                 return {
-                    stem: this.heavenlyStems[stemIndex],
-                    branch: this.earthlyBranches[branchIndex],
+                    stem: heavenlyStems[stemIndex],
+                    branch: earthlyBranches[branchIndex],
                     stemIndex: stemIndex,
                     branchIndex: branchIndex
                 };
             }
             
-            // 计算月柱
             calculateMonthPillar(yearPillar, month) {
-                // 月柱地支固定：正月为寅，二月为卯，以此类推 [1](@ref)
-                const branchIndex = (month + 1) % 12; // 调整索引
-                const branch = this.earthlyBranches[branchIndex];
+                const branchIndex = (month + 1) % 12;
+                const branch = earthlyBranches[branchIndex];
                 
-                // 月柱天干根据年干确定（五虎遁诀） [1](@ref)
                 const yearStem = yearPillar.stem;
                 const stemStartIndex = monthStemMap[yearStem];
                 const stemIndex = (stemStartIndex + month - 1) % 10;
-                const stem = this.heavenlyStems[stemIndex];
+                const stem = heavenlyStems[stemIndex];
                 
                 return {
                     stem: stem,
@@ -496,10 +486,7 @@
                 };
             }
             
-            // 计算日柱（简化版，实际应使用更精确的算法）
             calculateDayPillar(year, month, day) {
-                // 使用简化公式计算日柱（实际应使用更精确的算法如蔡勒公式） [1](@ref)
-                // 这里使用一个简化版本，实际应用中应使用更精确的算法
                 const baseDate = new Date(1900, 0, 1);
                 const targetDate = new Date(year, month - 1, day);
                 const diffTime = targetDate - baseDate;
@@ -509,24 +496,21 @@
                 const branchIndex = diffDays % 12;
                 
                 return {
-                    stem: this.heavenlyStems[stemIndex],
-                    branch: this.earthlyBranches[branchIndex],
+                    stem: heavenlyStems[stemIndex],
+                    branch: earthlyBranches[branchIndex],
                     stemIndex: stemIndex,
                     branchIndex: branchIndex
                 };
             }
             
-            // 计算时柱
             calculateHourPillar(dayPillar, hour) {
-                // 时柱地支：每两小时为一个时辰 [1](@ref)
                 const branchIndex = Math.floor(hour / 2) % 12;
-                const branch = this.earthlyBranches[branchIndex];
+                const branch = earthlyBranches[branchIndex];
                 
-                // 时柱天干根据日干确定（五鼠遁诀） [1](@ref)
                 const dayStem = dayPillar.stem;
                 const stemStartIndex = hourStemMap[dayStem];
                 const stemIndex = (stemStartIndex + Math.floor(hour / 2)) % 10;
-                const stem = this.heavenlyStems[stemIndex];
+                const stem = heavenlyStems[stemIndex];
                 
                 return {
                     stem: stem,
@@ -536,16 +520,13 @@
                 };
             }
             
-            // 计算十神
             calculateTenGods(dayStem, targetStem) {
                 return tenGodsRelations[dayStem]?.[targetStem] || "未知";
             }
             
-            // 分析五行旺衰
             analyzeElementsStrength(bazi) {
                 const elementsCount = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
                 
-                // 统计天干地支五行 [6](@ref)
                 Object.values(bazi).forEach(pillar => {
                     if (pillar.stem && fiveElements[pillar.stem]) {
                         elementsCount[fiveElements[pillar.stem]]++;
@@ -558,26 +539,10 @@
                 return elementsCount;
             }
             
-            // 判断日主旺衰（简化版） [10](@ref)
-            analyzeStrength(bazi, elementsCount) {
-                // 简化旺衰判断：根据五行数量
-                const dayStemElement = fiveElements[bazi.day.stem];
-                const dayElementCount = elementsCount[dayStemElement];
-                
-                const totalElements = Object.values(elementsCount).reduce((a, b) => a + b, 0);
-                const percentage = (dayElementCount / totalElements) * 100;
-                
-                if (percentage > 30) return "身旺";
-                if (percentage < 20) return "身弱";
-                return "中和";
-            }
-            
-            // 获取生肖
             getZodiac(yearBranchIndex) {
-                return this.earthlyBranches[yearBranchIndex];
+                return zodiacAnimals[yearBranchIndex];
             }
             
-            // 综合八字排盘
             calculateBazi(year, month, day, hour) {
                 const yearPillar = this.calculateYearPillar(year);
                 const monthPillar = this.calculateMonthPillar(yearPillar, month);
@@ -593,7 +558,7 @@
             }
         }
         
-        // 命理解读生成器
+        // ==================== 命理解读类 ====================
         class InterpretationGenerator {
             constructor() {
                 this.marriageInterpretations = {
@@ -621,22 +586,18 @@
                 };
             }
             
-            // 生成婚姻解读
             generateMarriageInterpretation(dominantElement) {
                 return this.marriageInterpretations[dominantElement] || "婚姻幸福需要双方共同经营。";
             }
             
-            // 生成事业解读
             generateCareerInterpretation(dominantElement) {
                 return this.careerInterpretations[dominantElement] || "事业成功需要努力和机遇。";
             }
             
-            // 生成健康解读
             generateHealthInterpretation(dominantElement) {
                 return this.healthInterpretations[dominantElement] || "保持规律作息和良好心态。";
             }
             
-            // 生成十神解读
             generateTenGodsInterpretation(tenGods) {
                 let interpretation = "";
                 
@@ -656,7 +617,7 @@
                     interpretation += "正财代表稳定收入，您理财观念强，注重实际收益。";
                 }
                 if (tenGods.includes("偏财")) {
-                    interpretation += "偏财代表意外之财，您有投资眼光，但需注意风险。";
+                    interpretation += "极偏财代表意外之财，您有投资眼光，但需注意风险。";
                 }
                 if (tenGods.includes("食神")) {
                     interpretation += "食神代表福气与才华，您天性乐观，有艺术天赋。";
@@ -674,9 +635,7 @@
                 return interpretation || "十神配置均衡，各方面发展较为平衡。";
             }
             
-            // 生成综合命理报告
-            generateComprehensiveReport(bazi, elementsCount, strength, gender, zodiac) {
-                // 找出最多的五行
+            generateComprehensiveReport(bazi, elementsCount, gender, zodiac) {
                 const maxElement = Object.keys(elementsCount).reduce((a, b) => 
                     elementsCount[a] > elementsCount[b] ? a : b, "木");
                 
@@ -685,18 +644,16 @@
                     career: this.generateCareerInterpretation(maxElement),
                     health: this.generateHealthInterpretation(maxElement),
                     zodiac: zodiac,
-                    dominantElement: maxElement,
-                    strength: strength
+                    dominantElement: maxElement
                 };
             }
         }
         
-        // 页面加载完成后初始化
+        // ==================== 页面功能实现 ====================
         document.addEventListener('DOMContentLoaded', function() {
             const calculator = new ProfessionalBaziCalculator();
             const interpreter = new InterpretationGenerator();
             
-            // 获取页面元素
             const calculateBtn = document.getElementById('calculate-btn');
             const clearBtn = document.getElementById('clear-btn');
             const resultDiv = document.getElementById('result');
@@ -746,9 +703,6 @@
                         // 分析五行
                         const elementsCount = calculator.analyzeElementsStrength(bazi);
                         
-                        // 判断旺衰
-                        const strength = calculator.analyzeStrength(bazi, elementsCount);
-                        
                         // 获取生肖
                         const zodiac = calculator.getZodiac(bazi.year.branchIndex);
                         
@@ -761,20 +715,20 @@
                         
                         // 生成解读
                         const interpretation = interpreter.generateComprehensiveReport(
-                            bazi, elementsCount, strength, gender, zodiac
+                            bazi, elementsCount, gender, zodiac
                         );
                         
                         // 生成十神解读
                         const tenGodsInterpretation = interpreter.generateTenGodsInterpretation(tenGods);
                         
-                        // 显示五行图表
+                        // 生成五行图表
                         const elementsChart = generateElementsChart(elementsCount);
                         
                         // 显示结果
                         resultDiv.innerHTML = `
                             <h3>${name}（${gender}）的八字排盘</h3>
                             <p><strong>生辰信息：</strong>${year}年${month}月${day}日 ${document.getElementById('hour').options[document.getElementById('hour').selectedIndex].text}</p>
-                            <p><strong>生肖：</strong>${zodiac} | <strong>日主旺衰：</strong>${strength}</p>
+                            <p><strong>生肖：</strong>${zodiac}</p>
                             
                             <div class="bazi-grid">
                                 <div class="bazi-pillar">
@@ -794,13 +748,13 @@
                                 </div>
                                 <div class="bazi-pillar">
                                     <div class="pillar-label">时柱</div>
-                                    <div class="pillar-value">${bazi.hour.stem}${bazi.hour.branch}</div>
+                                    <div class="pillar-value">${bazi.hour.stem}极${bazi.hour.branch}</div>
                                     <div>${fiveElements[bazi.hour.stem]}${fiveElements[bazi.hour.branch]}</div>
                                 </div>
                             </div>
                             
                             <div class="interpretation-section">
-                                <h4>📊 五行强弱分析</h4>
+                                <h4>📊 五行能量分析</h4>
                                 ${elementsChart}
                             </div>
                             
@@ -866,7 +820,7 @@
                 for (const element in elementsCount) {
                     const height = maxCount > 0 ? (elementsCount[element] / maxCount) * 100 : 0;
                     chartHTML += `
-                        <div class="element-bar" style="background-color: ${colors[element]}; height: ${height}%">
+                        <div class="element-bar" style="height: ${height}%">
                             <div class="element-label">${element}(${elementsCount[element]})</div>
                         </div>
                     `;
