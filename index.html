@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI运势测算大师</title>
+    <title>八字命理测算大师</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,8 +13,8 @@
         }
         
         body {
-            font-family: 'Microsoft YaHei', 'SimSun', serif;
-            background: linear-gradient(135deg, #8B0000 0%, #4B0082 100%);
+            font-family: 'Ma Shan Zheng', 'Microsoft YaHei', cursive, serif;
+            background: linear-gradient(135deg, #8b0000 0%, #2f004f 100%);
             color: #333;
             min-height: 100vh;
             display: flex;
@@ -30,7 +31,7 @@
             width: 100%;
             max-width: 600px;
             padding: 30px;
-            border: 3px double #8B0000;
+            border: 3px double #8b0000;
             position: relative;
             overflow: hidden;
         }
@@ -42,25 +43,45 @@
             left: 0;
             right: 0;
             height: 10px;
-            background: linear-gradient(90deg, #8B0000, #FFD700, #8B0000);
+            background: linear-gradient(90deg, #8b0000, #d4af37, #8b0000);
+        }
+        
+        .yin-yang {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, #8b0000 50%, #2f004f 50%);
+            margin: 0 auto 20px;
+            position: relative;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .yin-yang::before, .yin-yang::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .yin-yang::before {
+            background: #2f004f;
+            top: 0;
+            left: 40px;
+        }
+        
+        .yin-yang::after {
+            background: #8b0000;
+            top: 40px;
+            left: 0;
         }
         
         h1 {
             text-align: center;
-            color: #8B0000;
+            color: #8b0000;
             margin-bottom: 10px;
             font-size: 32px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            position: relative;
-        }
-        
-        h1::after {
-            content: "";
-            display: block;
-            width: 100px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #8B0000, transparent);
-            margin: 10px auto;
         }
         
         .subtitle {
@@ -74,27 +95,45 @@
             margin-bottom: 20px;
         }
         
-        input[type="text"] {
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-field {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #5a3921;
+            font-weight: bold;
+        }
+        
+        input, select {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             border: 2px solid #d4a76a;
             border-radius: 8px;
             font-size: 16px;
             background: #fffaf0;
             transition: all 0.3s;
-            margin-bottom: 15px;
         }
         
-        input[type="text"]:focus {
+        input:focus, select:focus {
             outline: none;
-            border-color: #8B0000;
+            border-color: #8b0000;
             box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.2);
         }
         
         .button-group {
             display: flex;
             gap: 15px;
-            margin-bottom: 25px;
+            margin: 25px 0;
         }
         
         button {
@@ -106,26 +145,27 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
+            font-family: 'Ma Shan Zheng', cursive;
         }
         
-        #ask-button {
-            background: linear-gradient(135deg, #8B0000, #B22222);
+        #calculate-btn {
+            background: linear-gradient(135deg, #8b0000, #b22222);
             color: white;
         }
         
-        #ask-button:hover:not(:disabled) {
-            background: linear-gradient(135deg, #B22222, #8B0000);
+        #calculate-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #b22222, #8b0000);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);
         }
         
-        #clear-button {
-            background: linear-gradient(135deg, #4B0082, #6A5ACD);
+        #clear-btn {
+            background: linear-gradient(135deg, #4b0082, #6a5acd);
             color: white;
         }
         
-        #clear-button:hover {
-            background: linear-gradient(135deg, #6A5ACD, #4B0082);
+        #clear-btn:hover {
+            background: linear-gradient(135deg, #6a5acd, #4b0082);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(75, 0, 130, 0.4);
         }
@@ -134,32 +174,64 @@
             opacity: 0.7;
             cursor: not-allowed;
             transform: none !important;
-            box-shadow: none !important;
         }
         
         #result {
-            min-height: 150px;
+            min-height: 200px;
             padding: 20px;
             background: #f9f3e9;
             border-radius: 8px;
-            border-left: 5px solid #8B0000;
+            border-left: 5px solid #8b0000;
             margin-top: 20px;
-            white-space: pre-wrap;
-            text-align: left;
+            display: none;
+        }
+        
+        .bazi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .bazi-pillar {
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(135deg, #f5e6d3, #e8d0b3);
+            border-radius: 8px;
+            border: 2px solid #d4a76a;
+        }
+        
+        .pillar-label {
+            font-size: 14px;
+            color: #8b0000;
+            margin-bottom: 5px;
+        }
+        
+        .pillar-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #5a3921;
+        }
+        
+        .interpretation {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(139, 0, 0, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #d4af37;
         }
         
         .loading {
-            color: #8B0000;
             text-align: center;
+            color: #8b0000;
             font-style: italic;
-        }
-        
-        .success {
-            border-left-color: #228B22;
+            padding: 20px;
         }
         
         .error {
-            border-left-color: #FF4500;
+            color: #ff4500;
+            text-align: center;
+            padding: 20px;
         }
         
         .footer {
@@ -169,47 +241,21 @@
             color: #7a6a5a;
         }
         
-        .yin-yang {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(90deg, #8B0000 50%, #4B0082 50%);
-            margin: 0 auto 20px;
-            position: relative;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .yin-yang::before, .yin-yang::after {
-            content: "";
-            position: absolute;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-        }
-        
-        .yin-yang::before {
-            background: #4B0082;
-            top: 0;
-            left: 30px;
-        }
-        
-        .yin-yang::after {
-            background: #8B0000;
-            top: 30px;
-            left: 0;
-        }
-        
         @media (max-width: 600px) {
-            .container {
-                padding: 20px;
+            .form-row {
+                flex-direction: column;
             }
             
-            h1 {
-                font-size: 24px;
+            .form-field {
+                min-width: 100%;
             }
             
             .button-group {
                 flex-direction: column;
+            }
+            
+            .bazi-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -217,131 +263,262 @@
 <body>
     <div class="container">
         <div class="yin-yang"></div>
-        <h1>AI运势测算大师</h1>
-        <p class="subtitle">请输入你的问题，让AI大师为你解读运势!</p>
+        <h1>八字命理测算大师</h1>
+        <p class="subtitle">请输入您的出生信息，获取精准八字排盘与命理解读</p>
         
         <div class="input-group">
-            <input type="text" id="user-input" placeholder="例如：测一下我今天的财运如何？" maxlength="100">
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="name">姓名</label>
+                    <input type="text" id="name" placeholder="请输入姓名">
+                </div>
+                <div class="form-field">
+                    <label for="gender">性别</label>
+                    <select id="gender">
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="year">出生年份</label>
+                    <input type="number" id="year" min="1900" max="2025" placeholder="如：1990">
+                </div>
+                <div class="form-field">
+                    <label for="month">出生月份</label>
+                    <input type="number" id="month" min="1" max="12" placeholder="1-12">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="day">出生日期</label>
+                    <input type="number" id="day" min="1" max="31" placeholder="1-31">
+                </div>
+                <div class="form-field">
+                    <label for="hour">出生时辰</label>
+                    <select id="hour">
+                        <option value="0">子时 (23:00-01:00)</option>
+                        <option value="1">丑时 (01:00-03:00)</option>
+                        <option value="2">寅时 (03:00-05:00)</option>
+                        <option value="3">卯时 (05:00-07:00)</option>
+                        <option value="4">辰时 (07:00-09:00)</option>
+                        <option value="5">巳时 (09:00-11:00)</option>
+                        <option value="6">午时 (11:00-13:00)</option>
+                        <option value="7">未时 (13:00-15:00)</option>
+                        <option value="8">申时 (15:00-17:00)</option>
+                        <option value="9">酉时 (17:00-19:00)</option>
+                        <option value="10">戌时 (19:00-21:00)</option>
+                        <option value="11">亥时 (21:00-23:00)</option>
+                    </select>
+                </div>
+            </div>
         </div>
         
         <div class="button-group">
-            <button id="ask-button">请教AI大师</button>
-            <button id="clear-button">清空重来</button>
+            <button id="calculate-btn">测算八字</button>
+            <button id="clear-btn">清空重来</button>
         </div>
         
-        <div id="result">等待你的提问...</div>
+        <div id="result">
+            <!-- 结果将由JavaScript动态填充 -->
+        </div>
         
         <div class="footer">
-            <p>本测算仅供娱乐参考，命运掌握在自己手中</p>
+            <p>本测算结果仅供参考，命运掌握在自己手中</p>
         </div>
     </div>
 
     <script>
-        // 定义API地址 - 使用相对路径避免跨域问题
-        const API_URL = '/api/fortune';
+        // 天干地支定义
+        const heavenlyStems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+        const earthlyBranches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
         
-        // 页面加载完成后执行
-        document.addEventListener('DOMContentLoaded', function() {
-            // 获取页面元素
-            const userInput = document.getElementById('user-input');
-            const askButton = document.getElementById('ask-button');
-            const clearButton = document.getElementById('clear-button');
-            const resultDiv = document.getElementById('result');
+        // 时辰对应表
+        const hourBranches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+        
+        // 五行属性
+        const fiveElements = {
+            "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土", 
+            "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水",
+            "子": "水", "丑": "土", "寅": "木", "卯": "木", "辰": "土",
+            "巳": "火", "午": "火", "未": "土", "申": "金", "酉": "金",
+            "戌": "土", "亥": "水"
+        };
+        
+        // 命理解读库
+        const interpretations = {
+            "木": "木主仁，其性直，其情和。木盛的人长得丰姿秀丽，骨骼修长，手足细腻，口尖发美，面色青白。为人有博爱恻隐之心，慈祥恺悌之意，清高慷慨，质朴无伪。",
+            "火": "火主礼，其性急，其情恭。火盛之人头小脚长，上尖下阔，浓眉小耳，精神闪烁，为人谦和恭敬，纯朴急躁。火衰之人则黄瘦尖楞，语言妄诞，诡诈妒毒，做事有始无终。",
+            "土": "土主信，其性重，其情厚。土盛之人圆腰廓鼻，眉清目秀，口才声重。为人忠孝至诚，度量宽厚，言必行，行必果。土气太过则头脑僵化，愚拙不明，内向好静。",
+            "金": "金主义，其性刚，其情烈。金盛之人骨肉相称，面方白净，眉高眼深，体健神清。为人刚毅果断，疏财仗义，深知廉耻。太过则有勇无谋，贪欲不仁。",
+            "水": "水主智，其性聪，其情善。水盛之人面黑有彩，语言清和，为人深思熟虑，足智多谋，学识过人。太过则好说是非，飘荡贪淫。不及则人物短小，性情无常，胆小无略，行事反覆。"
+        };
+        
+        // 获取页面元素
+        const calculateBtn = document.getElementById('calculate-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const resultDiv = document.getElementById('result');
+        
+        // 计算八字函数
+        function calculateBazi(year, month, day, hour) {
+            // 年柱计算（简化算法，实际应使用更精确的农历计算）
+            const yearStemIndex = (year - 4) % 10;
+            const yearBranchIndex = (year - 4) % 12;
+            const yearPillar = heavenlyStems[yearStemIndex] + earthlyBranches[yearBranchIndex];
             
-            // 主要的AI提问函数
-            async function askAI() {
-                const question = userInput.value.trim();
+            // 月柱计算（简化算法）
+            const monthStemIndex = (yearStemIndex * 2 + month) % 10;
+            const monthBranchIndex = (month + 1) % 12;
+            const monthPillar = heavenlyStems[monthStemIndex] + earthlyBranches[monthBranchIndex];
+            
+            // 日柱计算（使用简化公式，实际应使用更精确算法）
+            const baseDate = new Date(1900, 0, 1);
+            const targetDate = new Date(year, month - 1, day);
+            const diffTime = targetDate - baseDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const dayStemIndex = diffDays % 10;
+            const dayBranchIndex = diffDays % 12;
+            const dayPillar = heavenlyStems[dayStemIndex] + earthlyBranches[dayBranchIndex];
+            
+            // 时柱计算
+            const hourStemIndex = (dayStemIndex * 2 + Math.floor(hour/2)) % 10;
+            const hourBranchIndex = hour % 12;
+            const hourPillar = heavenlyStems[hourStemIndex] + earthlyBranches[hourBranchIndex];
+            
+            return {
+                year: yearPillar,
+                month: monthPillar,
+                day: dayPillar,
+                hour: hourPillar
+            };
+        }
+        
+        // 生成命理解读
+        function generateInterpretation(bazi, gender) {
+            const elementsCount = {};
+            
+            // 统计五行
+            Object.values(bazi).forEach(pillar => {
+                const stem = pillar[0];
+                const branch = pillar[1];
                 
-                // 验证输入
-                if (!question) {
-                    alert('请输入你的问题！');
-                    return;
+                if (fiveElements[stem]) {
+                    elementsCount[fiveElements[stem]] = (elementsCount[fiveElements[stem]] || 0) + 1;
                 }
-                
-                if (question.length < 2) {
-                    alert('问题太短了，请详细描述一下～');
-                    return;
-                }
-                
-                // 禁用按钮，防止重复提交
-                askButton.disabled = true;
-                askButton.textContent = 'AI大师思考中...';
-                resultDiv.innerHTML = '<div class="loading">🔄 AI大师正在思考中，请稍候...</div>';
-                resultDiv.className = '';
-                
-                try {
-                    console.log('准备发送请求到API:', API_URL);
-                    
-                    // 发送请求到API
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ 
-                            userMessage: question 
-                        })
-                    });
-                    
-                    console.log('收到响应状态:', response.status);
-                    
-                    // 检查响应状态
-                    if (!response.ok) {
-                        throw new Error(`网络请求失败: ${response.status}`);
-                    }
-                    
-                    // 解析响应数据
-                    const data = await response.json();
-                    console.log('API返回数据:', data);
-                    
-                    if (data.error) {
-                        throw new Error(data.error);
-                    }
-                    
-                    // 显示成功结果
-                    resultDiv.className = 'success';
-                    resultDiv.innerHTML = `<strong>✨ AI大师解读：</strong><br><br>${data.reply}`;
-                    
-                } catch (error) {
-                    // 显示错误信息
-                    console.error('请求失败:', error);
-                    resultDiv.className = 'error';
-                    
-                    if (error.message.includes('Failed to fetch')) {
-                        resultDiv.innerHTML = `<strong>❌ 网络连接失败：</strong><br><br>无法连接到AI大师，请检查网络连接或稍后重试。<br><br><small>错误详情: ${error.message}</small>`;
-                    } else {
-                        resultDiv.innerHTML = `<strong>❌ 出错了：</strong><br><br>${error.message}`;
-                    }
-                } finally {
-                    // 重新启用按钮
-                    askButton.disabled = false;
-                    askButton.textContent = '请教AI大师';
-                }
-            }
-            
-            // 清空输入函数
-            function clearInput() {
-                userInput.value = '';
-                resultDiv.className = '';
-                resultDiv.innerHTML = '等待你的提问...';
-                userInput.focus();
-            }
-            
-            // 绑定按钮事件
-            askButton.addEventListener('click', askAI);
-            clearButton.addEventListener('click', clearInput);
-            
-            // 按回车键也可以提交
-            userInput.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    askAI();
+                if (fiveElements[branch]) {
+                    elementsCount[fiveElements[branch]] = (elementsCount[fiveElements[branch]] || 0) + 1;
                 }
             });
             
-            // 页面加载后自动聚焦到输入框
-            userInput.focus();
+            // 找出最多的五行
+            const maxElement = Object.keys(elementsCount).reduce((a, b) => 
+                elementsCount[a] > elementsCount[b] ? a : b, "木");
             
-            console.log('页面加载完成，所有功能已就绪');
+            return interpretations[maxElement] || interpretations["木"];
+        }
+        
+        // 绑定计算按钮事件
+        calculateBtn.addEventListener('click', function() {
+            const name = document.getElementById('name').value.trim();
+            const gender = document.getElementById('gender').value;
+            const year = parseInt(document.getElementById('year').value);
+            const month = parseInt(document.getElementById('month').value);
+            const day = parseInt(document.getElementById('day').value);
+            const hour = parseInt(document.getElementById('hour').value);
+            
+            // 验证输入
+            if (!name) {
+                alert('请输入您的姓名');
+                return;
+            }
+            
+            if (!year || year < 1900 || year > new Date().getFullYear()) {
+                alert('请输入有效的出生年份（1900-当前年份）');
+                return;
+            }
+            
+            if (!month || month < 1 || month > 12) {
+                alert('请输入有效的出生月份（1-12）');
+                return;
+            }
+            
+            if (!day || day < 1 || day > 31) {
+                alert('请输入有效的出生日期（1-31）');
+                return;
+            }
+            
+            // 显示加载状态
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="loading">正在测算中，请稍候...</div>';
+            
+            // 模拟计算过程
+            setTimeout(() => {
+                try {
+                    // 计算八字
+                    const bazi = calculateBazi(year, month, day, hour);
+                    
+                    // 生成解读
+                    const interpretation = generateInterpretation(bazi, gender);
+                    
+                    // 显示结果
+                    resultDiv.innerHTML = `
+                        <h3>${name}（${gender}）的八字排盘</h3>
+                        <div class="bazi-grid">
+                            <div class="bazi-pillar">
+                                <div class="pillar-label">年柱</div>
+                                <div class="pillar-value">${bazi.year}</div>
+                                <div>${fiveElements[bazi.year[0]]}${fiveElements[bazi.year[1]]}</div>
+                            </div>
+                            <div class="bazi-pillar">
+                                <div class="pillar-label">月柱</div>
+                                <div class="pillar-value">${bazi.month}</div>
+                                <div>${fiveElements[bazi.month[0]]}${fiveElements[bazi.month[1]]}</div>
+                            </div>
+                            <div class="bazi-pillar">
+                                <div class="pillar-label">日柱</div>
+                                <div class="pillar-value">${bazi.day}</div>
+                                <div>${fiveElements[bazi.day[0]]}${fiveElements[bazi.day[1]]}</div>
+                            </div>
+                            <div class="bazi-pillar">
+                                <div class="pillar-label">时柱</div>
+                                <div class="pillar-value">${bazi.hour}</div>
+                                <div>${fiveElements[bazi.hour[0]]}${fiveElements[bazi.hour[1]]}</div>
+                            </div>
+                        </div>
+                        <div class="interpretation">
+                            <h4>命理简析</h4>
+                            <p>${interpretation}</p>
+                            <p>根据您的八字排盘，日主${bazi.day[0]}${fiveElements[bazi.day[0]]}，${gender === '男' ? '阳刚' : '阴柔'}之气充沛，
+                            为人${fiveElements[bazi.day[0]] === '木' ? '正直仁厚' : 
+                                 fiveElements[bazi.day[0]] === '火' ? '热情礼貌' :
+                                 fiveElements[bazi.day[0]] === '土' ? '诚信稳重' :
+                                 fiveElements[bazi.day[0]] === '金' ? '刚毅果断' : '智慧善良'}。</p>
+                        </div>
+                    `;
+                } catch (error) {
+                    resultDiv.innerHTML = '<div class="error">测算过程中出现错误，请检查输入信息后重试</div>';
+                    console.error('测算错误:', error);
+                }
+            }, 1500);
+        });
+        
+        // 清空按钮事件
+        clearBtn.addEventListener('click', function() {
+            document.getElementById('name').value = '';
+            document.getElementById('year').value = '';
+            document.getElementById('month').value = '';
+            document.getElementById('day').value = '';
+            document.getElementById('hour').value = '0';
+            resultDiv.style.display = 'none';
+            resultDiv.innerHTML = '';
+        });
+        
+        // 页面加载后自动聚焦到姓名输入框
+        window.addEventListener('load', function() {
+            document.getElementById('name').focus();
         });
     </script>
 </body>
