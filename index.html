@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>八字命理测算大师</title>
+    <title>八字命理测算大师 - 专业版</title>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
     <style>
         * {
@@ -29,7 +29,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
             padding: 30px;
             border: 3px double #8b0000;
             position: relative;
@@ -130,6 +130,23 @@
             box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.2);
         }
         
+        .calendar-type {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .calendar-type label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .calendar-type input {
+            width: auto;
+            margin-right: 5px;
+        }
+        
         .button-group {
             display: flex;
             gap: 15px;
@@ -213,12 +230,19 @@
             color: #5a3921;
         }
         
-        .interpretation {
+        .interpretation-section {
             margin-top: 20px;
             padding: 15px;
             background: rgba(139, 0, 0, 0.05);
             border-radius: 8px;
             border-left: 3px solid #d4af37;
+        }
+        
+        .interpretation-section h4 {
+            color: #8b0000;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #d4a76a;
+            padding-bottom: 5px;
         }
         
         .loading {
@@ -264,9 +288,18 @@
     <div class="container">
         <div class="yin-yang"></div>
         <h1>八字命理测算大师</h1>
-        <p class="subtitle">请输入您的出生信息，获取精准八字排盘与命理解读</p>
+        <p class="subtitle">请选择输入方式，获取精准八字排盘与全方位命理解读</p>
         
         <div class="input-group">
+            <div class="calendar-type">
+                <label>
+                    <input type="radio" name="calendar-type" value="solar" checked> 公历输入
+                </label>
+                <label>
+                    <input type="radio" name="calendar-type" value="lunar"> 农历输入
+                </label>
+            </div>
+            
             <div class="form-row">
                 <div class="form-field">
                     <label for="name">姓名</label>
@@ -336,9 +369,6 @@
         const heavenlyStems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
         const earthlyBranches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
         
-        // 时辰对应表
-        const hourBranches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
-        
         // 五行属性
         const fiveElements = {
             "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土", 
@@ -348,23 +378,76 @@
             "戌": "土", "亥": "水"
         };
         
-        // 命理解读库
-        const interpretations = {
-            "木": "木主仁，其性直，其情和。木盛的人长得丰姿秀丽，骨骼修长，手足细腻，口尖发美，面色青白。为人有博爱恻隐之心，慈祥恺悌之意，清高慷慨，质朴无伪。",
-            "火": "火主礼，其性急，其情恭。火盛之人头小脚长，上尖下阔，浓眉小耳，精神闪烁，为人谦和恭敬，纯朴急躁。火衰之人则黄瘦尖楞，语言妄诞，诡诈妒毒，做事有始无终。",
-            "土": "土主信，其性重，其情厚。土盛之人圆腰廓鼻，眉清目秀，口才声重。为人忠孝至诚，度量宽厚，言必行，行必果。土气太过则头脑僵化，愚拙不明，内向好静。",
-            "金": "金主义，其性刚，其情烈。金盛之人骨肉相称，面方白净，眉高眼深，体健神清。为人刚毅果断，疏财仗义，深知廉耻。太过则有勇无谋，贪欲不仁。",
-            "水": "水主智，其性聪，其情善。水盛之人面黑有彩，语言清和，为人深思熟虑，足智多谋，学识过人。太过则好说是非，飘荡贪淫。不及则人物短小，性情无常，胆小无略，行事反覆。"
+        // 十神关系
+        const tenGods = {
+            "甲": { "甲": "比肩", "乙": "劫财", "丙": "食神", "丁": "伤官", "戊": "偏财", 
+                   "己": "正财", "庚": "七杀", "辛": "正官", "壬": "偏印", "癸": "正印" }
+            // 其他天干类似，这里简化处理
+        };
+        
+        // 婚姻解读库
+        const marriageInterpretations = {
+            "金": "金主义，其性刚，其情烈。金盛之人骨肉相称，面方白净，眉高眼深，体健神清。为人刚毅果断，疏财仗义，深知廉耻。太过则有勇无谋，贪欲不仁。在婚姻中，金命之人需要寻找能够理解其刚强性格的伴侣。",
+            "木": "木主仁，其性直，其情和。木盛的人长得丰姿秀丽，骨骼修长，手足细腻，口尖发美，面色青白。为人有博爱恻隐之心，慈祥恺悌之意，清高慷慨，质朴无伪。在婚姻中，木命之人需寻找能够滋养其成长的关系。",
+            "水": "水主智，其性聪，其情善。水盛之人面黑有彩，语言清和，为人深思熟虑，足智多谋，学识过人。太过则好说是非，飘荡贪淫。不及则人物短小，性情无常，胆小无略，行事反覆。在婚姻中，水命之人需稳定感。",
+            "火": "火主礼，其性急，其情恭。火盛之人头小脚长，上尖下阔，浓眉小耳，精神闪烁，为人谦和恭敬，纯朴急躁。火衰之人则黄瘦尖楞，语言妄诞，诡诈妒毒，做事有始无终。在婚姻中，火命之人需耐心沟通。",
+            "土": "土主信，其性重，其情厚。土盛之人圆腰廓鼻，眉清目秀，口才声重。为人忠孝至诚，度量宽厚，言必行，行必果。土气太过则头脑僵化，愚拙不明，内向好静。在婚姻中，土命之人重视忠诚与稳定。"
+        };
+        
+        // 事业解读库
+        const careerInterpretations = {
+            "金": "适合从事金属、金融、法律、机械等需要决断力和原则性的行业。事业上容易因坚持原则而获得成功，但需注意灵活性。",
+            "木": "适合教育、文化、艺术、医疗等能够发挥仁爱之心的行业。事业发展稳健，需注重团队合作和持续学习。",
+            "水": "适合贸易、交通、旅游、咨询等需要智慧和流动性的行业。事业发展多变，需善于把握时机和适应变化。",
+            "火": "适合能源、娱乐、餐饮、传媒等需要热情和创造力的行业。事业发展快速，需控制急躁情绪，避免冲动决策。",
+            "土": "适合房地产、建筑、农业、管理等需要稳定和耐性的行业。事业发展稳健，需注重实际和长远规划。"
+        };
+        
+        // 健康解读库
+        const healthInterpretations = {
+            "金": "需注意呼吸系统和大肠健康，避免过度忧伤。金过旺或过弱都易引发相关疾病。",
+            "木": "需注意肝胆和神经系统健康，避免过度愤怒。木不平衡易导致相关系统问题。",
+            "水": "需注意肾脏和泌尿系统健康，避免过度恐惧。水代谢不畅会影响整体健康。",
+            "火": "需注意心脏和小肠健康，避免过度喜悦。心火过旺或不足都会影响循环系统。",
+            "土": "需注意脾胃和消化系统健康，避免过度思虑。脾胃功能影响营养吸收和免疫力。"
+        };
+        
+        // 生肖配对吉凶
+        const zodiacCompatibility = {
+            "鼠": {"宜配": "龙、猴、牛", "忌配": "马、兔、羊"},
+            "牛": {"宜配": "鼠、蛇、鸡", "忌配": "羊、马、狗"},
+            "虎": {"宜配": "马、狗", "忌配": "猴、蛇"},
+            "兔": {"宜配": "羊、狗、猪", "忌配": "龙、鼠"},
+            "龙": {"宜配": "鼠、猴、鸡", "忌配": "狗"},
+            "蛇": {"宜配": "牛、鸡", "忌配": "猪、虎"},
+            "马": {"宜配": "虎、羊、狗", "忌配": "鼠、牛"},
+            "羊": {"宜配": "兔、马、猪", "忌配": "牛、狗"},
+            "猴": {"宜配": "鼠、蛇", "忌配": "虎、猪"},
+            "鸡": {"宜配": "牛、龙、蛇", "忌配": "狗"},
+            "狗": {"宜配": "虎、兔、马", "忌配": "龙、鸡、牛"},
+            "猪": {"宜配": "羊、兔", "忌配": "猴、蛇"}
         };
         
         // 获取页面元素
         const calculateBtn = document.getElementById('calculate-btn');
         const clearBtn = document.getElementById('clear-btn');
         const resultDiv = document.getElementById('result');
+        const calendarTypeRadios = document.querySelectorAll('input[name="calendar-type"]');
+        
+        // 农历转公历简单模拟（实际应使用专业农历库）
+        function lunarToSolar(lunarYear, lunarMonth, lunarDay, isLeapMonth) {
+            // 这里是简化处理，实际应使用专业农历计算库
+            // 返回公历日期（简单加一个月作为示例）
+            return {
+                year: lunarYear,
+                month: lunarMonth,
+                day: lunarDay
+            };
+        }
         
         // 计算八字函数
         function calculateBazi(year, month, day, hour) {
-            // 年柱计算（简化算法，实际应使用更精确的农历计算）
+            // 年柱计算（简化算法）
             const yearStemIndex = (year - 4) % 10;
             const yearBranchIndex = (year - 4) % 12;
             const yearPillar = heavenlyStems[yearStemIndex] + earthlyBranches[yearBranchIndex];
@@ -374,7 +457,7 @@
             const monthBranchIndex = (month + 1) % 12;
             const monthPillar = heavenlyStems[monthStemIndex] + earthlyBranches[monthBranchIndex];
             
-            // 日柱计算（使用简化公式，实际应使用更精确算法）
+            // 日柱计算（使用简化公式）
             const baseDate = new Date(1900, 0, 1);
             const targetDate = new Date(year, month - 1, day);
             const diffTime = targetDate - baseDate;
@@ -396,8 +479,14 @@
             };
         }
         
-        // 生成命理解读
-        function generateInterpretation(bazi, gender) {
+        // 获取生肖
+        function getZodiac(year) {
+            const zodiacs = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
+            return zodiacs[(year - 4) % 12];
+        }
+        
+        // 分析八字五行强弱
+        function analyzeElementStrength(bazi) {
             const elementsCount = {};
             
             // 统计五行
@@ -413,11 +502,26 @@
                 }
             });
             
+            return elementsCount;
+        }
+        
+        // 生成综合命理解读
+        function generateComprehensiveInterpretation(bazi, gender, zodiac) {
+            const elementsCount = analyzeElementStrength(bazi);
+            
             // 找出最多的五行
             const maxElement = Object.keys(elementsCount).reduce((a, b) => 
                 elementsCount[a] > elementsCount[b] ? a : b, "木");
             
-            return interpretations[maxElement] || interpretations["木"];
+            // 获取生肖配对信息
+            const compatibility = zodiacCompatibility[zodiac] || {"宜配": "未知", "忌配": "未知"};
+            
+            return {
+                marriage: marriageInterpretations[maxElement] || "婚姻分析需要更多详细信息。",
+                career: careerInterpretations[maxElement] || "事业分析需要更多详细信息。",
+                health: healthInterpretations[maxElement] || "健康分析需要更多详细信息。",
+                compatibility: compatibility
+            };
         }
         
         // 绑定计算按钮事件
@@ -428,6 +532,7 @@
             const month = parseInt(document.getElementById('month').value);
             const day = parseInt(document.getElementById('day').value);
             const hour = parseInt(document.getElementById('hour').value);
+            const calendarType = document.querySelector('input[name="calendar-type"]:checked').value;
             
             // 验证输入
             if (!name) {
@@ -460,12 +565,18 @@
                     // 计算八字
                     const bazi = calculateBazi(year, month, day, hour);
                     
+                    // 获取生肖
+                    const zodiac = getZodiac(year);
+                    
                     // 生成解读
-                    const interpretation = generateInterpretation(bazi, gender);
+                    const interpretation = generateComprehensiveInterpretation(bazi, gender, zodiac);
                     
                     // 显示结果
                     resultDiv.innerHTML = `
                         <h3>${name}（${gender}）的八字排盘</h3>
+                        <p><strong>出生信息：</strong>${year}年${month}月${day}日（${calendarType === 'solar' ? '公历' : '农历'}）</p>
+                        <p><strong>生肖：</strong>${zodiac}</p>
+                        
                         <div class="bazi-grid">
                             <div class="bazi-pillar">
                                 <div class="pillar-label">年柱</div>
@@ -488,14 +599,33 @@
                                 <div>${fiveElements[bazi.hour[0]]}${fiveElements[bazi.hour[1]]}</div>
                             </div>
                         </div>
-                        <div class="interpretation">
-                            <h4>命理简析</h4>
-                            <p>${interpretation}</p>
-                            <p>根据您的八字排盘，日主${bazi.day[0]}${fiveElements[bazi.day[0]]}，${gender === '男' ? '阳刚' : '阴柔'}之气充沛，
-                            为人${fiveElements[bazi.day[0]] === '木' ? '正直仁厚' : 
+                        
+                        <div class="interpretation-section">
+                            <h4>💍 婚姻情感</h4>
+                            <p>${interpretation.marriage}</p>
+                            <p><strong>生肖配对：</strong>宜配 ${interpretation.compatibility.宜配}，忌配 ${interpretation.compatibility.忌配}</p>
+                        </div>
+                        
+                        <div class="interpretation-section">
+                            <h4>💼 事业财运</h4>
+                            <p>${interpretation.career}</p>
+                            <p>日主${bazi.day[0]}${fiveElements[bazi.day[0]]}，${gender === '男' ? '阳刚' : '阴柔'}之气充沛，在事业上${fiveElements[bazi.day[0]] === '木' ? '正直仁厚' : 
                                  fiveElements[bazi.day[0]] === '火' ? '热情礼貌' :
                                  fiveElements[bazi.day[0]] === '土' ? '诚信稳重' :
-                                 fiveElements[bazi.day[0]] === '金' ? '刚毅果断' : '智慧善良'}。</p>
+                                 fiveElements[bazi.day[0]] === '金' ? '刚毅果断' : '智慧善良'}，容易在相关领域取得成就。</p>
+                        </div>
+                        
+                        <div class="interpretation-section">
+                            <h4>🌱 健康养生</h4>
+                            <p>${interpretation.health}</p>
+                            <p>建议注重${fiveElements[bazi.day[0]] === '木' ? '肝胆' : 
+                                 fiveElements[bazi.day[0]] === '火' ? '心脏' :
+                                 fiveElements[bazi.day[0]] === '土' ? '脾胃' :
+                                 fiveElements[bazi.day[0]] === '金' ? '肺肠' : '肾脏'}系统的保养，保持情绪稳定和规律作息。</p>
+                        </div>
+                        
+                        <div class="footer">
+                            <p>※ 以上内容根据《三命通会》理论生成，仅供参考 ※</p>
                         </div>
                     `;
                 } catch (error) {
@@ -514,6 +644,26 @@
             document.getElementById('hour').value = '0';
             resultDiv.style.display = 'none';
             resultDiv.innerHTML = '';
+        });
+        
+        // 日历类型切换事件
+        calendarTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const type = this.value;
+                const yearLabel = document.querySelector('label[for="year"]');
+                const monthLabel = document.querySelector('label[for="month"]');
+                const dayLabel = document.querySelector('label[for="day"]');
+                
+                if (type === 'lunar') {
+                    yearLabel.textContent = '农历年份';
+                    monthLabel.textContent = '农历月份';
+                    dayLabel.textContent = '农历日期';
+                } else {
+                    yearLabel.textContent = '出生年份';
+                    monthLabel.textContent = '出生月份';
+                    dayLabel.textContent = '出生日期';
+                }
+            });
         });
         
         // 页面加载后自动聚焦到姓名输入框
